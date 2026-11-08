@@ -6,6 +6,7 @@ from .settings import MIDDLEWARE as BASE_MIDDLEWARE
 DEBUG = False
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 ALLOWED_HOSTS = ["portfolio.narayam.net"]
+SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
