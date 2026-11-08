@@ -1,11 +1,26 @@
 {% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A software developer portfolio and project showcase.">
-    <title>Sujil's Portfolio</title>
+    {% with page_title="Sujil Mani | Software Development & Agentic AI" description="Sujil Mani's portfolio covers application support management, software development and architecture, and Agentic AI engineering." %}
+    <title>{{ page_title }}</title>
+    <meta name="description" content="{{ description }}">
+    <link rel="canonical" href="https://portfolio.narayam.net/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Sujil Mani Portfolio">
+    <meta property="og:title" content="{{ page_title }}">
+    <meta property="og:description" content="{{ description }}">
+    <meta property="og:url" content="https://portfolio.narayam.net/">
+    <meta property="og:image" content="https://portfolio.narayam.net{% static 'portfolio-share.jpg' %}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="800">
+    <meta property="og:image:alt" content="Blue software workflows connected to a central AI hub">
+    <meta name="twitter:card" content="summary_large_image">
+    {% endwith %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'portfolio-icon.svg' %}">
     <link rel="stylesheet" href="{% static 'portfolio.css' %}">
 </head>
 <body>
@@ -27,7 +42,7 @@
                 <p class="eyebrow">Agentic AI research &middot; Automation</p>
                 <h1 id="hero-title">Sujil Mani</h1>
                 <p class="hero-summary">I research agentic AI and explore how it can automate software workflows. My background spans more than 10 years in application support, IT operations and web development.</p>
-                <p class="hero-focus">Software development &middot; Technical leadership</p>
+                <p class="hero-focus">Application support management &middot; Software development and architecture &middot; Agentic AI engineering</p>
                 <a class="button" href="#experience">Explore my experience <span aria-hidden="true">&darr;</span></a>
             </div>
         </section>
