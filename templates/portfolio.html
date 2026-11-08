@@ -195,9 +195,11 @@
                         <h3 id="recognition-title">Kaseya Customer Hero Award</h3>
                         <p><time datetime="2026-07">July 2026</time></p>
                         <p>Kaseya recognised me for my contribution, dedication and commitment to excellence. This award is a highlight of my time in technical support, where I help customers work through complex issues and coordinate with colleagues to resolve them.</p>
-                        <a href="{% static 'kaseya-customer-hero-award.jpg' %}">View full certificate</a>
+                        <a href="{% static 'kaseya-customer-hero-award.jpg' %}" data-certificate-preview>View full certificate</a>
                     </div>
-                    <img class="expertise-image" src="{% static 'kaseya-customer-hero-award.jpg' %}" alt="Kaseya Customer Hero Award certificate presented to Sujil Mani in July 2026" loading="lazy" decoding="async">
+                    <a class="award-preview" href="{% static 'kaseya-customer-hero-award.jpg' %}" data-certificate-preview aria-label="View Kaseya Customer Hero Award certificate">
+                        <img class="expertise-image" src="{% static 'kaseya-customer-hero-award.jpg' %}" alt="Kaseya Customer Hero Award certificate presented to Sujil Mani in July 2026" loading="lazy" decoding="async">
+                    </a>
                 </article>
             </section>
 
@@ -256,5 +258,18 @@
         </nav>
         <a href="#main">Back to top &uarr;</a>
     </footer>
+    <dialog class="certificate-gallery" id="certificate-gallery" aria-labelledby="certificate-title">
+        <div class="certificate-toolbar">
+            <h2 id="certificate-title">Kaseya Customer Hero Award</h2>
+            <form method="dialog">
+                <button type="submit" class="certificate-close" aria-label="Close certificate" autofocus>&times;</button>
+            </form>
+        </div>
+        <figure class="certificate-slide">
+            <img src="{% static 'kaseya-customer-hero-award.jpg' %}" alt="Kaseya Customer Hero Award certificate presented to Sujil Mani in July 2026" loading="lazy">
+            <figcaption>July 2026 <span aria-hidden="true">&middot;</span> 1 of 1</figcaption>
+        </figure>
+    </dialog>
+    <script src="{% static 'certificate-gallery.js' %}" defer></script>
 </body>
 </html>

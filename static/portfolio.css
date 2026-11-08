@@ -366,3 +366,66 @@ a.social-profile:hover { background: var(--surface); }
 @media (max-width: 44rem) {
     .award-card { grid-template-columns: 1fr; }
 }
+
+.award-card .award-preview {
+    display: block;
+    margin-top: 0;
+    cursor: zoom-in;
+}
+
+html:has(.certificate-gallery[open]) { overflow: hidden; }
+
+.certificate-gallery {
+    width: min(58rem, calc(100% - 1.5rem));
+    max-height: calc(100dvh - 1.5rem);
+    padding: 0;
+    border: 1px solid #33425c;
+    border-radius: 1.25rem;
+    background: #101a2b;
+    color: #fff;
+}
+
+.certificate-gallery::backdrop { background: rgb(5 14 32 / 82%); }
+
+.certificate-toolbar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .75rem 1rem;
+    background: #101a2b;
+}
+
+.certificate-toolbar h2 {
+    margin: 0;
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    letter-spacing: normal;
+}
+
+.certificate-close {
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid #667795;
+    border-radius: 50%;
+    background: #243653;
+    color: #fff;
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.certificate-close:hover { background: #36527b; }
+.certificate-close:focus-visible { outline: 2px solid #a8ccff; outline-offset: 3px; }
+
+.certificate-slide { margin: 0; padding: 0 1rem 1rem; text-align: center; }
+
+.certificate-slide img {
+    display: block;
+    width: 100%;
+    max-height: 72dvh;
+    object-fit: contain;
+}
+
+.certificate-slide figcaption { margin-top: .65rem; color: #c4d1e8; font-size: .85rem; }
