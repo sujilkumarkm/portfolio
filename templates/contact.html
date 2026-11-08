@@ -1,0 +1,52 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Contact Sujil Mani in Dundalk, County Louth.">
+    <title>Contact Me | Sujil Mani</title>
+    <link rel="stylesheet" href="{% static 'portfolio.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+        <nav class="nav shell" aria-label="Main navigation">
+            <a class="brand" href="{% url 'home' %}">Home</a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}#experience">Experience</a>
+                <a href="{% url 'home' %}#work">Projects</a>
+                <a href="{% url 'home' %}#about">About</a>
+                <a href="{% url 'contact' %}" aria-current="page">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main" class="contact-page shell">
+        <p class="eyebrow">Get in touch</p>
+        <h1>Contact me.</h1>
+        <div class="contact-grid">
+            <section class="profile-card" aria-labelledby="address-title">
+                <h2 id="address-title">Address</h2>
+                <address>{{ street_address }}<br>{{ locality }}<br>{{ region }}</address>
+                {% if phone %}
+                    <p class="contact-phone"><a class="button call-button" href="tel:{{ phone }}">Call me <span>{{ phone }}</span></a></p>
+                {% endif %}
+                {% with query=street_address|add:", "|add:locality|add:", "|add:region %}
+                    <a href="https://www.google.com/maps/search/?api=1&amp;query={{ query|urlencode }}">Open in Google Maps</a>
+                {% endwith %}
+            </section>
+            {% with query=street_address|add:", "|add:locality|add:", "|add:region %}
+                <iframe class="contact-map" title="Google Maps showing the contact address in Dundalk"
+                    src="https://maps.google.com/maps?q={{ query|urlencode }}&amp;output=embed"
+                    width="800" height="450" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            {% endwith %}
+        </div>
+    </main>
+
+    <footer class="site-footer shell">
+        <span>Sujil Mani</span>
+        <a href="{% url 'home' %}">Back to portfolio</a>
+    </footer>
+</body>
+</html>

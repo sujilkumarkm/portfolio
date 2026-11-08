@@ -1,0 +1,194 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A software developer portfolio and project showcase.">
+    <title>Sujil's Portfolio</title>
+    <link rel="stylesheet" href="{% static 'portfolio.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+        <nav class="nav shell" aria-label="Main navigation">
+            <a class="brand" href="{% url 'home' %}">Home</a>
+            <div class="nav-links">
+                <a href="#experience">Experience</a> <a href="#work">Projects</a> <a href="#skills">Skills</a>
+                <a href="#about">About</a>
+                <a href="{% url 'contact' %}">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-inner shell">
+                <p class="eyebrow">Agentic AI research &middot; Automation</p>
+                <h1 id="hero-title">Sujil Mani</h1>
+                <p class="hero-summary">I research agentic AI and explore how it can automate software workflows. My background spans more than 10 years in application support, IT operations and web development.</p>
+                <p class="hero-focus">Software development &middot; Technical leadership</p>
+                <a class="button" href="#experience">Explore my experience <span aria-hidden="true">&darr;</span></a>
+            </div>
+        </section>
+
+        <section class="resume-section shell" id="experience" aria-labelledby="experience-title">
+            <p class="eyebrow">01 / Career</p>
+            <h2 id="experience-title">Experience.</h2>
+            <p class="section-intro">Expand a role to see the systems I supported and the work I did.</p>
+            <figure class="support-illustration">
+                <img class="expertise-image" src="{% static 'expertise-support.webp' %}" alt="Illustration of connected devices, servers and an incident alert" width="1200" height="800" loading="lazy" decoding="async">
+                <figcaption>Application support &middot; Endpoint monitoring and incident investigation</figcaption>
+            </figure>
+            <div class="timeline">
+                <details class="role" open>
+                    <summary><strong>Senior Technical Support Expert</strong><span>Kaseya, Ireland &middot; Nov 2022 &ndash; Present</span></summary>
+                    <ul>
+                        <li>Support Datto RMM and EDR customers, clarify business impact, and explain findings, workarounds and next steps.</li>
+                        <li>Investigate outages, web interface faults and agent connectivity using backend and device logs, DNS, firewall rules and allowlisting.</li>
+                        <li>Use SQL and database tools to investigate data and platform access issues, and administer role-based access.</li>
+                        <li>Troubleshoot REST, SOAP and third-party SaaS integrations with Postman and SoapUI, including Microsoft 365 connectivity and data feeds.</li>
+                        <li>Investigate FTP/SFTP transfers, SSL certificates and Excel/CSV exchanges.</li>
+                        <li>Document incidents and resolutions, and coordinate escalations with specialist support, product teams and R&amp;D.</li>
+                        <li>Triage Datto EDR and RocketCyber alerts, configure patch and software policies, and train new colleagues through shadowing and troubleshooting feedback.</li>
+                    </ul>
+                </details>
+                <details class="role">
+                    <summary><strong>PHP Laravel Developer</strong><span>Maple Techspace, Canada (remote) &middot; Mar &ndash; Sep 2021</span></summary>
+                    <ul>
+                        <li>Built Laravel and Vue.js applications with MySQL and Bootstrap 4, and refined CSS layouts based on user feedback.</li>
+                        <li>Managed changes in Git, Bitbucket and GitHub, resolved post-launch faults, and worked with QA on smoke tests and daily checks.</li>
+                    </ul>
+                </details>
+                <details class="role">
+                    <summary><strong>Web Developer and IT Support</strong><span>Hyvision Technology L.L.C., Dubai &middot; Dec 2019 &ndash; Nov 2020</span></summary>
+                    <ul>
+                        <li>Configured computers for new joiners and supported ServiceNow tickets, project administration and IT asset records.</li>
+                        <li>Maintained WordPress sites and product listings, and supported hosting and file transfers through cPanel, FileZilla and WinSCP.</li>
+                        <li>Supported marketing and sales with Google Analytics reports, website updates and vendor coordination.</li>
+                    </ul>
+                </details>
+                <details class="role">
+                    <summary><strong>IT Support Engineer</strong><span>MAB Facility Management, Abu Dhabi &middot; Jan 2015 &ndash; Nov 2019</span></summary>
+                    <ul>
+                        <li>Provided deskside support to Louvre Abu Dhabi clients and internal users, resolving hardware, software, network and peripheral issues within agreed SLAs.</li>
+                        <li>Investigated VDI, vSphere and Active Directory issues, deployed laptops, configured access and maintained Windows patches and software updates.</li>
+                        <li>Maintained asset and inventory records, presented weekly reports to the IT Director and performed minor laptop repairs.</li>
+                    </ul>
+                </details>
+                <details class="role">
+                    <summary><strong>Junior Web Designer Intern</strong><span>i3 Technologies, Inc, India &middot; Jan &ndash; Nov 2014</span></summary>
+                    <ul>
+                        <li>Designed pages with HTML and CSS and added interactions using jQuery.</li>
+                        <li>Developed multi-tier applications using Java, JSP, PHP, MySQL and web services.</li>
+                    </ul>
+                </details>
+            </div>
+        </section>
+
+        <section class="work shell" id="work" aria-labelledby="work-title">
+            <p class="eyebrow">02 / Projects</p>
+            <h2 id="work-title">Selected work.</h2>
+            <div class="project-grid">
+                <article class="project project-dark">
+                    <div class="project-copy">
+                        <p class="project-tag">Django &middot; Python</p>
+                        <h3>Developer portfolio</h3>
+                        <p>A Django site for publishing my work and the decisions behind each project.</p>
+                    </div>
+                    <div class="project-art browser-art" aria-hidden="true">
+                        <div class="mock-window">
+                            <div class="mock-toolbar"><i></i><i></i><i></i></div>
+                            <div class="mock-page"><span>PORTFOLIO</span><strong>Building for<br>the web.</strong></div>
+                        </div>
+                    </div>
+                </article>
+                <article class="project project-light">
+                    <div class="project-copy">
+                        <p class="project-tag">Planned &middot; AI</p>
+                        <h3>Ask about my work</h3>
+                        <p>A chat assistant that will answer questions using information from my public profile and projects.</p>
+                    </div>
+                    <div class="project-art chat-art" aria-hidden="true">
+                        <div class="bubble question">What are you working on?</div>
+                        <div class="bubble answer">A Django portfolio and a project assistant.</div>
+                    </div>
+                </article>
+            </div>
+            <div class="profile-grid two-columns">
+                <article class="profile-card">
+                    <img class="expertise-image" src="{% static 'expertise-development.webp' %}" alt="Illustration of layered browser windows and a database" width="1200" height="800" loading="lazy" decoding="async">
+                    <h3>Laravel and Vue.js applications</h3>
+                    <p>Built MySQL-backed applications at Maple Techspace, improved layouts from user feedback, and worked with QA to check fixes after launch.</p>
+                    <a href="#experience">Explore my experience</a>
+                </article>
+                <article class="profile-card">
+                    <img class="expertise-image" src="{% static 'expertise-analytics.webp' %}" alt="Illustration of a time-series line and bars on a dashboard" width="1200" height="800" loading="lazy" decoding="async">
+                    <h3>Dashboards and time series</h3>
+                    <p>Created Python Dash dashboards and visualisations with Excel, Power BI and Tableau during my master&rsquo;s. My research covered time series analysis and machine learning.</p>
+                    <a href="#education">Explore my education</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="resume-section shell" id="skills" aria-labelledby="skills-title">
+            <p class="eyebrow">03 / Toolkit</p>
+            <h2 id="skills-title">Skills.</h2>
+            <div class="profile-grid">
+                <article class="profile-card"><h3>Application support</h3><p>Incident triage, root cause investigation, backend and device logs, SLA-based support, escalation, customer communication and knowledge sharing.</p></article>
+                <article class="profile-card"><h3>Data and integrations</h3><p>SQL Server, MySQL, SQL scripting, SQL Server Management Studio, REST, SOAP, Postman, SoapUI, FTP/SFTP, SSL, Excel and CSV.</p></article>
+                <article class="profile-card"><h3>Business tools and reporting</h3><p>Salesforce, IFS, Autotask PSA, ServiceNow, Zendesk, Microsoft 365, IT Glue, Power BI and Tableau.</p></article>
+            </div>
+        </section>
+
+        <section class="resume-section shell" id="education" aria-labelledby="education-title">
+            <p class="eyebrow">04 / Learning</p>
+            <h2 id="education-title">Education &amp; credentials.</h2>
+            <div class="profile-grid two-columns">
+                <article class="profile-card">
+                    <h3>Education</h3>
+                    <ul>
+                        <li><strong>Master&rsquo;s in Data Analytics (Level 9)</strong><br>Dundalk Institute of Technology, Ireland &middot; Sep 2021 &ndash; Aug 2022</li>
+                        <li><strong>Bachelor of Engineering in Computer Science</strong><br>Karavali Institute of Technology, India &middot; Jul 2011 &ndash; Apr 2015</li>
+                    </ul>
+                </article>
+                <article class="profile-card">
+                    <h3>Certifications</h3>
+                    <ul>
+                        <li>Datto Certified Deployment Specialist &middot; Jan 2023</li>
+                        <li>ARIMA Model Time Series Analysis, DataCamp &middot; Jun 2022</li>
+                        <li>Introduction to Programming Using Python, DataCamp &middot; Jun 2022</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="about" id="about" aria-labelledby="about-title">
+            <div class="about-inner shell">
+                <img class="about-portrait" src="{% static 'portfolio-portrait.jpg' %}" alt="Sujil Mani seated on a sofa" width="1434" height="2048" loading="lazy" decoding="async">
+                <div class="about-copy">
+                    <p class="eyebrow">05 / About</p>
+                    <h2 id="about-title">About me.</h2>
+                    <p>I work with customers and development teams to investigate application faults, explain what happened and document how issues were resolved. My background combines web development and IT operations with a Master&rsquo;s in Data Analytics.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer shell">
+        <span>Sujil Mani</span>
+        <nav class="social-links" aria-label="Professional profiles">
+            <a class="social-profile" href="https://github.com/sujilkumarkm">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false">
+                    <path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.64-1.25-1.64-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.16 1.72 1.16 1 .1.53 1.96 3.27 1.04.1-.73.39-1.23.71-1.51-2.5-.29-5.12-1.25-5.12-5.56 0-1.23.44-2.23 1.16-3.02-.12-.29-.51-1.43.11-2.98 0 0 .95-.3 3.1 1.15a10.77 10.77 0 0 1 5.64 0c2.15-1.46 3.1-1.15 3.1-1.15.62 1.55.23 2.69.11 2.98.72.79 1.16 1.79 1.16 3.02 0 4.32-2.63 5.27-5.14 5.55.4.35.76 1.03.76 2.08v3.09c0 .3.2.65.78.54A11.25 11.25 0 0 0 12 .75Z"/>
+                </svg>
+                GitHub
+            </a>
+            <a class="social-profile" href="https://www.linkedin.com/in/sujil">
+                <span class="linkedin-mark" aria-hidden="true">in</span>
+                LinkedIn
+            </a>
+        </nav>
+        <a href="#main">Back to top &uarr;</a>
+    </footer>
+</body>
+</html>
