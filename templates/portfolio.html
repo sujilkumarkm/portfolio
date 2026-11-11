@@ -333,5 +333,150 @@
         </figure>
     </dialog>
     <script src="{% static 'certificate-gallery.js' %}" defer></script>
+	Here’s a lightweight floating chat button for your Django portfolio. It opens a small contact panel with WhatsApp and email links; it doesn’t require a chat backend.
+
+Paste this into your main template—usually `base.html`—just before `</body>`. Replace the sample phone number and email with yours.
+
+```html
+<style>
+  .portfolio-chat {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    font-family: system-ui, sans-serif;
+  }
+
+  .portfolio-chat__button {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    color: white;
+    background: #2563eb;
+    box-shadow: 0 8px 24px #0003;
+    cursor: pointer;
+  }
+
+  .portfolio-chat__button:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+  }
+
+  .portfolio-chat__button svg {
+    width: 27px;
+    height: 27px;
+  }
+
+  .portfolio-chat__panel {
+    position: absolute;
+    right: 0;
+    bottom: 72px;
+    width: min(320px, calc(100vw - 32px));
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: white;
+    color: #111827;
+    box-shadow: 0 12px 40px #0002;
+  }
+
+  .portfolio-chat__panel[hidden] {
+    display: none;
+  }
+
+  .portfolio-chat__panel h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+  }
+
+  .portfolio-chat__panel p {
+    margin: 0 0 16px;
+    color: #4b5563;
+    font-size: 14px;
+  }
+
+  .portfolio-chat__link {
+    display: block;
+    margin-top: 10px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    background: #f3f4f6;
+    color: #111827;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .portfolio-chat__link:hover {
+    background: #e5e7eb;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .portfolio-chat__button {
+      transition: transform 160ms ease, background 160ms ease;
+    }
+  }
+</style>
+
+<div class="portfolio-chat">
+  <section
+    class="portfolio-chat__panel"
+    id="portfolio-chat-panel"
+    aria-labelledby="portfolio-chat-title"
+    hidden
+  >
+    <h2 id="portfolio-chat-title">Let’s talk</h2>
+    <p>Have a question or an opportunity? Choose how to reach me.</p>
+
+    <a class="portfolio-chat__link" target="_blank" href="https://huggingface.co/spaces/sujilmani/twin">
+      Live Chat with AI Agent
+    </a>
+  </section>
+
+  <button
+    class="portfolio-chat__button"
+    id="portfolio-chat-button"
+    type="button"
+    aria-label="Open contact options"
+    aria-controls="portfolio-chat-panel"
+    aria-expanded="false"
+  >
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 5.75A2.75 2.75 0 0 1 6.75 3h10.5A2.75 2.75 0 0 1 20 5.75v7.5A2.75 2.75 0 0 1 17.25 16H10l-5 4v-4.5A2.75 2.75 0 0 1 4 13.25v-7.5Z"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8 8h8M8 11.5h5"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+</div>
+
+<script>
+  (() => {
+    const button = document.getElementById("portfolio-chat-button");
+    const panel = document.getElementById("portfolio-chat-panel");
+
+    button.addEventListener("click", () => {
+      const isOpening = panel.hidden;
+      panel.hidden = !isOpening;
+      button.setAttribute("aria-expanded", String(isOpening));
+      button.setAttribute(
+        "aria-label",
+        isOpening ? "Close contact options" : "Open contact options"
+      );
+    });
+  })();
+</script>
+
 </body>
 </html>
