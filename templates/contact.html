@@ -7,27 +7,32 @@
     <meta name="description" content="Contact Sujil Mani in Dundalk, County Louth.">
     <title>Contact Me | Sujil Mani</title>
     <link rel="icon" type="image/svg+xml" href="{% static 'portfolio-icon.svg' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&amp;display=swap">
     <link rel="stylesheet" href="{% static 'portfolio.css' %}">
+    <script src="{% static 'portfolio-motion.js' %}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
         <nav class="nav shell" aria-label="Main navigation">
-            <a class="brand" href="{% url 'home' %}">Home</a>
-            <div class="nav-links">
-                <a href="{% url 'home' %}#experience">Experience</a>
+            <a class="brand" href="{% url 'home' %}" aria-label="Sujil Mani home"><span aria-hidden="true">&lt;/&gt;</span> Sujil Mani</a>
+            <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="primary-links" aria-label="Menu"><span></span><span></span></button>
+            <div class="nav-links" id="primary-links">
+                <a href="{% url 'home' %}#skills">Skills</a>
                 <a href="{% url 'home' %}#work">Projects</a>
+                <a href="{% url 'home' %}#experience">Experience</a>
                 <a href="{% url 'home' %}#about">About</a>
-                <a href="{% url 'contact' %}" aria-current="page">Contact</a>
+                <a class="button nav-contact" href="{% url 'contact' %}" aria-current="page">Contact <span aria-hidden="true">&nearr;</span></a>
             </div>
         </nav>
     </header>
 
-    <main id="main" class="contact-page shell">
-        <p class="eyebrow">Get in touch</p>
-        <h1>Contact me.</h1>
+    <main id="main" class="contact-page shell" tabindex="-1">
+        <h1>Contact <span class="outline-text">me.</span></h1>
         <div class="contact-grid">
-            <section class="profile-card" aria-labelledby="address-title">
+            <section class="profile-card" aria-labelledby="address-title" data-card-glow>
                 <h2 id="address-title">Address</h2>
                 <address>{{ street_address }}<br>{{ locality }}<br>{{ region }}</address>
                 {% if phone %}
