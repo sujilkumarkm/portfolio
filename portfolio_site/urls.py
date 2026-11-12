@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import path, reverse
 from django.views.generic.base import RedirectView
@@ -34,6 +35,13 @@ def contact(request):
     )
 
 
+def google_site_verification(request):
+    return HttpResponse(
+        "google-site-verification: google223f70130798bf8b.html",
+        content_type="text/html; charset=utf-8",
+    )
+
+
 def sitemap(request):
     page_urls = [SITE_ORIGIN + reverse(route) for route in ("home", "contact")]
     return render(
@@ -45,6 +53,7 @@ def sitemap(request):
 
 
 urlpatterns = [
+    path("google223f70130798bf8b.html", google_site_verification),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap, name="sitemap"),
     path("favicon.ico", RedirectView.as_view(url="/static/favicon-v2.png", permanent=True)),
