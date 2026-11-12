@@ -7,7 +7,7 @@ from django.urls import reverse
 SITE_ORIGIN = "https://sujil.net"
 CANONICAL_HOST = urlsplit(SITE_ORIGIN).netloc
 SITE_NAME = "Sujil Mani"
-SHARE_IMAGE = "sujil-mani-preview.jpg"
+SHARE_IMAGE = "sujil-mani-preview-v2.jpg"
 
 
 def canonical_host_redirect(get_response):
