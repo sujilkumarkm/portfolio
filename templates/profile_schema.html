@@ -1,0 +1,33 @@
+{% load static %}
+{% static 'portfolio-portrait.jpg' as portrait_path %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "WebSite",
+            "@id": "{{ site_origin }}/#website",
+            "url": "{{ page_url }}",
+            "name": "{{ site_name }}"
+        },
+        {
+            "@type": "ProfilePage",
+            "@id": "{{ page_url }}#profile",
+            "url": "{{ page_url }}",
+            "isPartOf": {"@id": "{{ site_origin }}/#website"},
+            "mainEntity": {"@id": "{{ page_url }}#person"}
+        },
+        {
+            "@type": "Person",
+            "@id": "{{ page_url }}#person",
+            "name": "{{ site_name }}",
+            "url": "{{ page_url }}",
+            "image": "{{ site_origin }}{{ portrait_path }}",
+            "sameAs": [
+                "https://github.com/sujilkumarkm",
+                "https://www.linkedin.com/in/sujil"
+            ]
+        }
+    ]
+}
+</script>
