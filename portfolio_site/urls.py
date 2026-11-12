@@ -54,6 +54,7 @@ def sitemap(request):
 
 urlpatterns = [
     path("google223f70130798bf8b.html", google_site_verification),
+    path("sitemap.xml/google223f70130798bf8b.html", google_site_verification),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap, name="sitemap"),
     path("favicon.ico", RedirectView.as_view(url="/static/favicon-v2.png", permanent=True)),
