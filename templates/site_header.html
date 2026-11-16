@@ -7,6 +7,7 @@
                 <a href="{% url 'home' %}#work">Projects</a>
                 <a href="{% url 'software' %}"{% if request.resolver_match.url_name == "software" %} aria-current="page"{% endif %}>Software</a>
                 <a href="{% url 'ai' %}"{% if request.resolver_match.url_name == "ai" %} aria-current="page"{% endif %}>AI</a>
+                <a href="{% url 'support' %}"{% if request.resolver_match.url_name == "support" %} aria-current="page"{% endif %}>Support</a>
                 <a href="{% url 'home' %}#experience">Experience</a>
                 <a href="{% url 'home' %}#about">About</a>
                 <a class="button nav-contact" href="{% url 'contact' %}">Contact <span aria-hidden="true">&nearr;</span></a>

@@ -40,6 +40,18 @@ def ai(request):
     )
 
 
+def support(request):
+    return render(
+        request,
+        "support.html",
+        page_metadata(
+            "support",
+            "IT Support | Sujil Mani",
+            "Explore Sujil Mani’s Apple and Microsoft support, device management, and identity and access capabilities.",
+        ),
+    )
+
+
 def contact(request):
     return render(
         request,
@@ -67,7 +79,7 @@ def google_site_verification(request):
 
 
 def sitemap(request):
-    page_urls = [SITE_ORIGIN + reverse(route) for route in ("home", "software", "ai", "contact")]
+    page_urls = [SITE_ORIGIN + reverse(route) for route in ("home", "software", "ai", "support", "contact")]
     return render(
         request,
         "sitemap.xml",
@@ -85,5 +97,6 @@ urlpatterns = [
     path("contact/", contact, name="contact"),
     path("software/", software, name="software"),
     path("ai/", ai, name="ai"),
+    path("support/", support, name="support"),
     path("", home, name="home"),
 ]
