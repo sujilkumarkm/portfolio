@@ -338,14 +338,14 @@
     place-items: center;
     border: 0;
     border-radius: 50%;
-    color: white;
-    background: #2563eb;
+    color: #21140c;
+    background: var(--accent);
     box-shadow: 0 8px 24px #0003;
     cursor: pointer;
   }
 
   .portfolio-chat__button:hover {
-    background: #1d4ed8;
+    background: var(--accent-light);
     transform: translateY(-2px);
   }
 
@@ -358,44 +358,55 @@
     position: absolute;
     right: 0;
     bottom: 72px;
-    width: min(320px, calc(100vw - 32px));
-    padding: 20px;
-    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    width: min(36rem, calc(100vw - 48px));
+    height: min(40rem, calc(100dvh - 112px));
+    overflow: hidden;
+    border: 1px solid var(--line);
     border-radius: 16px;
-    background: white;
-    color: #111827;
-    box-shadow: 0 12px 40px #0002;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 12px 40px #0008;
   }
 
   .portfolio-chat__panel[hidden] {
     display: none;
   }
 
-  .portfolio-chat__panel h2 {
-    margin: 0 0 6px;
-    font-size: 18px;
+  .portfolio-chat__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .45rem .8rem .45rem 1rem;
+    border-bottom: 1px solid var(--line);
   }
 
-  .portfolio-chat__panel p {
-    margin: 0 0 16px;
-    color: #4b5563;
-    font-size: 14px;
+  .portfolio-chat__header h2 {
+    margin: 0;
+    font-size: 1rem;
   }
 
-  .portfolio-chat__link {
-    display: block;
-    margin-top: 10px;
-    padding: 11px 14px;
-    border-radius: 9px;
-    background: #f3f4f6;
-    color: #111827;
-    text-align: center;
-    text-decoration: none;
-    font-weight: 600;
+  .portfolio-chat__close {
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: .5rem;
+    background: transparent;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
   }
 
-  .portfolio-chat__link:hover {
-    background: #e5e7eb;
+  .portfolio-chat__close:hover {
+    background: #ffffff14;
+  }
+
+  .portfolio-chat__frame {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    border: 0;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -412,19 +423,22 @@
     aria-labelledby="portfolio-chat-title"
     hidden
   >
-    <h2 id="portfolio-chat-title">Let’s talk</h2>
-    <p>Have a question or an opportunity? Chat with my twin Agent</p>
-
-    <a class="portfolio-chat__link" href="#ask-about-my-work">
-      Live Chat with AI Agent
-    </a>
+    <div class="portfolio-chat__header">
+      <h2 id="portfolio-chat-title">Digital Twin</h2>
+      <button class="portfolio-chat__close" type="button" aria-label="Close chat">&times;</button>
+    </div>
+    <iframe
+      class="portfolio-chat__frame"
+      data-src="https://sujilmani-twin.hf.space/"
+      title="Chat with Sujil Mani’s Digital Twin"
+    ></iframe>
   </section>
 
   <button
     class="portfolio-chat__button"
     id="portfolio-chat-button"
     type="button"
-    aria-label="Open contact options"
+    aria-label="Open chat"
     aria-controls="portfolio-chat-panel"
     aria-expanded="false"
   >
@@ -450,18 +464,23 @@
     const button = document.getElementById("portfolio-chat-button");
     const panel = document.getElementById("portfolio-chat-panel");
 
-    panel.querySelector(".portfolio-chat__link").addEventListener("click", () => {
-      if (!panel.hidden) button.click();
-    });
+    const closeButton = panel.querySelector(".portfolio-chat__close");
+    const frame = panel.querySelector(".portfolio-chat__frame");
 
-    button.addEventListener("click", () => {
-      const isOpening = panel.hidden;
-      panel.hidden = !isOpening;
-      button.setAttribute("aria-expanded", String(isOpening));
-      button.setAttribute(
-        "aria-label",
-        isOpening ? "Close contact options" : "Open contact options"
-      );
+    function setChatOpen(isOpen) {
+      if (isOpen && !frame.hasAttribute("src")) {
+        frame.src = frame.dataset.src;
+      }
+      panel.hidden = !isOpen;
+      button.setAttribute("aria-expanded", String(isOpen));
+      button.setAttribute("aria-label", isOpen ? "Close chat" : "Open chat");
+      (isOpen ? closeButton : button).focus();
+    }
+
+    button.addEventListener("click", () => setChatOpen(panel.hidden));
+    closeButton.addEventListener("click", () => setChatOpen(false));
+    panel.addEventListener("keydown", event => {
+      if (event.key === "Escape") setChatOpen(false);
     });
   })();
 </script>
