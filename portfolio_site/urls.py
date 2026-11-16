@@ -28,6 +28,18 @@ def software(request):
     )
 
 
+def ai(request):
+    return render(
+        request,
+        "ai.html",
+        page_metadata(
+            "ai",
+            "Agentic AI | Sujil Mani",
+            "Explore Sujil Mani’s Career Digital Twin, agent engineering capabilities and applied AI workflows.",
+        ),
+    )
+
+
 def contact(request):
     return render(
         request,
@@ -55,7 +67,7 @@ def google_site_verification(request):
 
 
 def sitemap(request):
-    page_urls = [SITE_ORIGIN + reverse(route) for route in ("home", "software", "contact")]
+    page_urls = [SITE_ORIGIN + reverse(route) for route in ("home", "software", "ai", "contact")]
     return render(
         request,
         "sitemap.xml",
@@ -72,5 +84,6 @@ urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url="/static/favicon-v2.png", permanent=True)),
     path("contact/", contact, name="contact"),
     path("software/", software, name="software"),
+    path("ai/", ai, name="ai"),
     path("", home, name="home"),
 ]
