@@ -1,0 +1,203 @@
+{% load static %}
+<!doctype html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include "metadata.html" %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&amp;display=swap">
+    <link rel="stylesheet" href="{% static 'portfolio.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.17.0/devicon.min.css">
+    <script src="{% static 'portfolio-motion.js' %}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    {% include "site_header.html" %}
+    <main id="main" class="shell software-page" tabindex="-1">
+        <header class="software-intro">
+            <h1>Software<span>.</span></h1>
+            <p>Languages, frameworks and platforms for building, shipping and supporting applications.</p>
+            <nav class="software-jump" aria-label="Software categories">
+                <a href="#backend">Backend</a>
+                <a href="#frontend">Frontend</a>
+                <a href="#delivery">Delivery and platforms</a>
+            </nav>
+        </header>
+
+        <section class="software-section" id="backend" aria-labelledby="backend-title">
+            <h2 id="backend-title">Backend</h2>
+            <p>Application logic, integrations and data.</p>
+            <ul class="software-grid">
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-php-plain"></i></span>
+                    <div>
+                        <h3>PHP</h3>
+                        <p>Server-side logic for web applications.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-laravel-plain"></i></span>
+                    <div>
+                        <h3>Laravel</h3>
+                        <p>Routing, validation and database access for PHP applications.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true">API</span>
+                    <div>
+                        <h3>REST APIs</h3>
+                        <p>Connect applications and test HTTP integrations.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true">SQL</span>
+                    <div>
+                        <h3>SQL</h3>
+                        <p>Query data and investigate application issues.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-mysql-plain"></i></span>
+                    <div>
+                        <h3>MySQL</h3>
+                        <p>Store and query relational application data.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-python-plain"></i></span>
+                    <div>
+                        <h3>Python</h3>
+                        <p>Build Django sites, automate tasks and analyse data.</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="software-section" id="frontend" aria-labelledby="frontend-title">
+            <h2 id="frontend-title">Frontend</h2>
+            <p>Interfaces, styling and browser behaviour.</p>
+            <ul class="software-grid">
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-vuejs-plain"></i></span>
+                    <div>
+                        <h3>Vue.js</h3>
+                        <p>Build reusable components for interactive interfaces.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-javascript-plain"></i></span>
+                    <div>
+                        <h3>JavaScript</h3>
+                        <p>Handle events and add browser-side behaviour.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-html5-plain"></i></span>
+                    <div>
+                        <h3>HTML</h3>
+                        <p>Structure pages, forms and navigation.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-css3-plain"></i></span>
+                    <div>
+                        <h3>CSS</h3>
+                        <p>Style layouts for desktop and mobile screens.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-jquery-plain"></i></span>
+                    <div>
+                        <h3>jQuery</h3>
+                        <p>Maintain DOM interactions in existing applications.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-bootstrap-plain"></i></span>
+                    <div>
+                        <h3>Bootstrap</h3>
+                        <p>Build responsive layouts with grids and components.</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="software-section" id="delivery" aria-labelledby="delivery-title">
+            <h2 id="delivery-title">Delivery and platforms</h2>
+            <p>Source control, deployment and operating environments.</p>
+            <ul class="software-grid">
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-git-plain"></i></span>
+                    <div>
+                        <h3>Git</h3>
+                        <p>Track changes and manage branches.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-bitbucket-plain"></i></span>
+                    <div>
+                        <h3>Bitbucket</h3>
+                        <p>Host repositories and collaborate through pull requests.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-github-plain"></i></span>
+                    <div>
+                        <h3>GitHub</h3>
+                        <p>Publish repositories and review changes.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true">CI/CD</span>
+                    <div>
+                        <h3>CI/CD</h3>
+                        <p>Automate checks, builds and deployments.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-docker-plain"></i></span>
+                    <div>
+                        <h3>Docker</h3>
+                        <p>Package applications and dependencies in containers.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-googlecloud-plain"></i></span>
+                    <div>
+                        <h3>Google Cloud</h3>
+                        <p>Run cloud workloads and connect to managed services.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true">MH</span>
+                    <div>
+                        <h3>Mochahost</h3>
+                        <p>Manage website hosting and deployments through cPanel.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-azure-plain"></i></span>
+                    <div>
+                        <h3>Azure</h3>
+                        <p>Host applications and services on Microsoft’s cloud.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-linux-plain"></i></span>
+                    <div>
+                        <h3>Linux</h3>
+                        <p>Run server workloads and troubleshoot from the shell.</p>
+                    </div>
+                </li>
+                <li class="software-card">
+                    <span class="software-icon" aria-hidden="true"><i class="devicon-windows11-plain"></i></span>
+                    <div>
+                        <h3>Windows</h3>
+                        <p>Develop, support and troubleshoot desktop environments.</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

@@ -14,19 +14,7 @@
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-header">
-        <nav class="nav shell" aria-label="Main navigation">
-            <a class="brand" href="{% url 'home' %}" aria-label="Sujil Mani home"><span aria-hidden="true">&lt;/&gt;</span> Sujil Mani</a>
-            <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="primary-links" aria-label="Menu"><span></span><span></span></button>
-            <div class="nav-links" id="primary-links">
-                <a href="#skills">Skills</a>
-                <a href="#work">Projects</a>
-                <a href="#experience">Experience</a>
-                <a href="#about">About</a>
-                <a class="button nav-contact" href="{% url 'contact' %}">Contact <span aria-hidden="true">&nearr;</span></a>
-            </div>
-        </nav>
-    </header>
+    {% include "site_header.html" %}
 
     <main id="main" tabindex="-1">
         <section class="hero" aria-labelledby="hero-title">

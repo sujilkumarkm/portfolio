@@ -16,6 +16,18 @@ def home(request):
     return render(request, "portfolio.html", metadata)
 
 
+def software(request):
+    return render(
+        request,
+        "software.html",
+        page_metadata(
+            "software",
+            "Software | Sujil Mani",
+            "Explore the backend, frontend, delivery tools and platforms in Sujil Mani’s software stack.",
+        ),
+    )
+
+
 def contact(request):
     return render(
         request,
@@ -43,7 +55,7 @@ def google_site_verification(request):
 
 
 def sitemap(request):
-    page_urls = [SITE_ORIGIN + reverse(route) for route in ("home", "contact")]
+    page_urls = [SITE_ORIGIN + reverse(route) for route in ("home", "software", "contact")]
     return render(
         request,
         "sitemap.xml",
@@ -59,5 +71,6 @@ urlpatterns = [
     path("sitemap.xml", sitemap, name="sitemap"),
     path("favicon.ico", RedirectView.as_view(url="/static/favicon-v2.png", permanent=True)),
     path("contact/", contact, name="contact"),
+    path("software/", software, name="software"),
     path("", home, name="home"),
 ]
