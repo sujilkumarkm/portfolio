@@ -119,15 +119,19 @@
                         </div>
                     </div>
                 </article>
-                <article class="project" data-card-glow data-reveal>
+                <article class="project project-chat" id="ask-about-my-work" aria-labelledby="ask-about-my-work-title" tabindex="-1" data-card-glow data-reveal>
                     <div class="project-copy">
-                        <p class="project-tag">Planned &middot; AI</p>
-                        <h3>Ask about my work</h3>
-                        <p>A chat assistant that will answer questions using information from my public profile and projects.</p>
+                        <p class="project-tag">Digital Twin &middot; AI</p>
+                        <h3 id="ask-about-my-work-title">Ask about my work</h3>
+                        <p>Chat with my Digital Twin about my experience, skills and projects.</p>
                     </div>
-                    <div class="project-art chat-art" aria-hidden="true">
-                        <div class="bubble question">What are you working on?</div>
-                        <div class="bubble answer">A Django portfolio and a project assistant.</div>
+                    <div class="project-art chat-art">
+                        <iframe
+                            class="project-chat-frame"
+                            src="https://sujilmani-twin.hf.space/"
+                            title="Chat with Sujil Mani’s Digital Twin"
+                            loading="lazy"
+                        ></iframe>
                     </div>
                 </article>
             </div>
@@ -411,7 +415,7 @@
     <h2 id="portfolio-chat-title">Let’s talk</h2>
     <p>Have a question or an opportunity? Chat with my twin Agent</p>
 
-    <a class="portfolio-chat__link" target="_blank" href="https://huggingface.co/spaces/sujilmani/twin">
+    <a class="portfolio-chat__link" href="#ask-about-my-work">
       Live Chat with AI Agent
     </a>
   </section>
@@ -445,6 +449,10 @@
   (() => {
     const button = document.getElementById("portfolio-chat-button");
     const panel = document.getElementById("portfolio-chat-panel");
+
+    panel.querySelector(".portfolio-chat__link").addEventListener("click", () => {
+      if (!panel.hidden) button.click();
+    });
 
     button.addEventListener("click", () => {
       const isOpening = panel.hidden;
