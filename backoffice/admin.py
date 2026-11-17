@@ -2,7 +2,7 @@ from pathlib import Path
 
 from django import forms
 from django.contrib import admin, messages
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
 from django.template.loader import render_to_string
@@ -10,6 +10,7 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST
+from django.core.exceptions import PermissionDenied
 
 from .job_import import ImportError as JobImportError, import_posting
 from .models import Application, Document, Visitor
@@ -21,6 +22,29 @@ class PortfolioAdmin(admin.AdminSite):
     site_title = "Portfolio admin"
     index_title = "Dashboard"
     index_template = "admin/dashboard.html"
+
+    def get_urls(self):
+        return [
+            path("visitor-map/", self.admin_view(self.visitor_map), name="visitor_map"),
+            path("visitor-map/data/", self.admin_view(self.visitor_map_data), name="visitor_map_data"),
+            *super().get_urls(),
+        ]
+
+    def check_visitor_permission(self, request):
+        if not request.user.has_perm("backoffice.view_visitor"):
+            raise PermissionDenied
+
+    def visitor_map(self, request):
+        self.check_visitor_permission(request)
+        request.current_app = self.name
+        return TemplateResponse(request, "admin/visitor_map.html", {
+            **self.each_context(request), "title": "Visitor world map",
+        })
+
+    def visitor_map_data(self, request):
+        self.check_visitor_permission(request)
+        return JsonResponse({"countries": list(Visitor.objects.values("country").annotate(
+            visitors=Count("pk"), visits=Sum("visits")).order_by("country"))})
 
     def index(self, request, extra_context=None):
         locations = Visitor.objects.values("country", "region").annotate(visitors=Count("pk"))
@@ -258,7 +282,9 @@ class MemberAdmin(UserAdmin):
 
 @admin.register(Visitor, site=site)
 class VisitorAdmin(admin.ModelAdmin):
-    list_display = ("country", "region", "first_seen")
+    list_display = ("ip_address", "country", "region", "visits", "first_seen", "last_seen")
+    search_fields = ("ip_address", "country", "region")
+    readonly_fields = ("identifier", "ip_address", "country", "region", "visits", "first_seen", "last_seen")
     list_filter = ("country", "region")
     def has_add_permission(self, request):
         return False

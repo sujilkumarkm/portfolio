@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'visitor-map.css' %}">{% endblock %}
+{% block content %}
+<div class="dashboard-heading"><div><h1>Visitor world map</h1><p>Explore where your visitors come from. Hover, focus, or tap a country.</p></div><a class="dashboard-action" href="{% url 'admin:backoffice_visitor_changelist' %}">Visitor details →</a></div>
+<div id="visitor-map" data-outlines="{% static 'world-countries.geojson' %}" data-counts="{% url 'admin:visitor_map_data' %}" data-list="{% url 'admin:backoffice_visitor_changelist' %}">
+  <div class="map-summary"><span id="map-total">Loading visitors…</span><span id="map-status" role="status">Updating…</span><button id="map-refresh" type="button">Refresh</button></div>
+  <div class="map-canvas"><svg id="world-map" viewBox="0 0 1000 510" role="group" aria-label="Visitor counts by country"></svg></div>
+  <div id="map-selection" role="status">Select a country to see its visitor count.</div>
+  <p class="map-legend"><span></span> No visitors <span></span> More visitors · Totals refresh every 15 seconds</p>
+</div>
+<p>Counts represent consenting browser cookies, not verified individuals. IP locations are approximate. Unknown locations are included in the totals.</p>
+<table id="map-country-table"><caption>Visitors by country</caption><thead><tr><th>Country</th><th>Unique visitors</th><th>Visits</th></tr></thead><tbody></tbody></table>
+<p>Country outlines: <a href="https://www.naturalearthdata.com/about/terms-of-use/">Natural Earth, public domain</a>.</p>
+<script src="{% static 'visitor-map.js' %}" defer></script>
+{% endblock %}

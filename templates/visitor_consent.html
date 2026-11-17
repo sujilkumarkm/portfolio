@@ -1,7 +1,7 @@
 <div id="visitor-consent" hidden>
   <form action="{% url 'visitor_analytics' %}" method="post">
     {% csrf_token %}
-    <p>Allow an analytics cookie to count your visit and estimate your country or region?</p>
+    <p>Allow analytics to store your public IP address, estimate your country or region, and count your visits using a cookie? This information is visible only to authorised administrators.</p>
     <button type="submit" value="allow">Allow analytics</button>
     <button type="submit" value="decline">Decline</button>
     <p role="status"></p>

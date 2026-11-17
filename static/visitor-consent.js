@@ -4,7 +4,7 @@ const preferences = document.querySelector("#visitor-settings");
 if (consent && preferences) {
     const form = consent.querySelector("form");
     const status = form.querySelector("[role=status]");
-    const key = "portfolio-analytics-choice";
+    const key = "portfolio-analytics-choice-v2";
     const submit = async choice => {
         const data = new FormData(form);
         data.set("choice", choice);

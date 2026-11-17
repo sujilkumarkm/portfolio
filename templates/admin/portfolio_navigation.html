@@ -6,6 +6,7 @@
   <nav id="portfolio-menu" aria-label="Admin navigation">
     <ul>
       <li><a href="{% url 'admin:index' %}"{% if route == 'index' %} aria-current="page"{% endif %}>Dashboard</a></li>
+      {% if perms.backoffice.view_visitor %}<li><a href="{% url 'admin:visitor_map' %}">Visitor world map</a></li>{% endif %}
       {% for app in available_apps %}
         {% for model in app.models %}
           {% if model.admin_url %}

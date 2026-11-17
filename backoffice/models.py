@@ -5,6 +5,9 @@ from django.conf import settings
 
 
 class Visitor(models.Model):
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    last_seen = models.DateTimeField(null=True, blank=True)
+    visits = models.PositiveIntegerField(default=1)
     identifier = models.CharField(max_length=64, unique=True)
     country = models.CharField(max_length=2, blank=True)
     region = models.CharField(max_length=100, blank=True)

@@ -61,8 +61,9 @@ cookie remains valid (up to one year). Declining or disabling analytics removes
 the cookie. Previously counted visits remain in the dashboard. The database
 stores a pseudonymous identifier, the first visit time, and available
 country/region values. Counts represent browser cookies, so clearing cookies or
-using another browser can result in a new count. The analytics feature does
-not store raw IP addresses.
+using another browser can result in a new count. After the updated analytics consent is accepted, visitor records also store the
+public IP address, last visit time, and total tracked page visits. Earlier
+records remain without an IP until that browser returns and consents.
 
 For country and region reporting, configure a trusted edge to supply
 `CF-IPCountry` and, if available, `CF-Region`. Set
@@ -137,11 +138,42 @@ inbox, then test a subscribed member with a new job, an application stage change
 and an interview change, running the queue command after each save. Check an
 unsubscribed account receives none. Do this before switching production traffic.
 
-### Dashboard widgets
+### Dashboard links
 
-Each widget links to its underlying application or visitor list; active
-applications opens a filtered list. Drag **Move widget** to reorder, or focus
-that button and use Left/Right arrows. Drag the bottom-right resize corner to
-change width and height. Layout is saved per user in the current browser.
-**Reset widget layout** restores defaults. New widgets can use the same
-`dashboard-widget` class and a stable unique `data-widget` identifier.
+The dashboard retains its original layout. Click a number to open the associated
+visitor or application list. Active applications opens a filtered list; country
+and region counts open the matching visitors.
+
+
+### IP geolocation and live visitor map
+
+The approved dashboard layout is retained. Click **Visitors by country**, or
+**Visitor world map** in the admin menu, to open the interactive world map.
+Hover, tap, or keyboard-focus a country to see its unique visitor and visit
+counts; use its **View visitors** link for the filtered records. The map and
+country table refresh every 15 seconds while visible. Raw IPs are available
+only in the permission-protected visitor admin; map JSON contains aggregates.
+
+Install updated requirements and apply migrations. For direct connections,
+Django takes the public address from `REMOTE_ADDR`, ignoring forwarded headers.
+Behind Cloudflare, set `PORTFOLIO_TRUST_GEO_HEADERS=1` **only** when Cloudflare
+overwrites the geo/IP headers and direct access to the origin is blocked.
+This enables `CF-Connecting-IP`, `CF-IPCountry`, and optional `CF-Region`.
+For other proxies, configure the server to supply the correct `REMOTE_ADDR`.
+
+For local IP-to-country lookup, download a licensed GeoLite2 Country or City
+MMDB from MaxMind and set `GEOIP_DATABASE_PATH` to its absolute server path.
+Keep the database current using MaxMind's update tooling. IP addresses are
+looked up locally and are not sent to an external geolocation service.
+Without trusted country headers or a working MMDB, location stays Unknown.
+Private/loopback addresses are not stored. VPN/proxy locations may differ from
+a visitor's actual country. The map uses bundled Natural Earth public-domain
+country outlines; no third-party map requests are made in the browser.
+
+The consent preference version has changed so existing visitors are asked again
+before IP collection. Declining disables subsequent tracking. Existing historic
+records are retained. Counts measure consenting browser cookies, not individuals:
+five different consenting browsers located in GB count as five UK visitors;
+repeat page loads add visits without adding unique visitors. Clearing cookies
+can create another unique record. Counts represent the latest known location
+of each browser. Deploy this update only with the matching consent text.

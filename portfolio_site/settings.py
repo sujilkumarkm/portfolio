@@ -153,3 +153,6 @@ EMAIL_TIMEOUT = 15
 
 JOB_IMPORT_OPENAI_API_KEY = os.getenv("JOB_IMPORT_OPENAI_API_KEY", "")
 JOB_IMPORT_OPENAI_MODEL = os.getenv("JOB_IMPORT_OPENAI_MODEL", "gpt-4.1-mini")
+
+# Local MaxMind GeoLite2 Country or City database; IPs never leave this server.
+GEOIP_DATABASE_PATH = os.getenv("GEOIP_DATABASE_PATH", "")
