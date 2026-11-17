@@ -1,0 +1,17 @@
+{% extends "admin/change_form.html" %}
+
+{% block form_top %}
+  {{ block.super }}
+  {% include 'admin/application_progress.html' %}
+  <div class="job-import" hidden>
+    <button class="button" type="button" data-job-import="{% url 'admin:import_job_posting' %}">Import from URL</button>
+    <span role="status">Fill blank fields from a public HTTPS job posting.</span>
+  </div>
+{% endblock %}
+
+{% block extrabody %}
+  {{ block.super }}
+  {% if original %}
+    {% include 'admin/document_preview.html' %}
+  {% endif %}
+{% endblock %}

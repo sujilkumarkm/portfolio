@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'backoffice',
 ]
 
 MIDDLEWARE = [
@@ -104,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Dublin'
 
 USE_I18N = True
 
@@ -121,3 +123,29 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Enable MySQL/MariaDB by setting the database user and connection details.
+if os.getenv("PORTFOLIO_DB_USER"):
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("PORTFOLIO_DB_NAME", "suji1991_sujil_portfolio"),
+        "USER": os.environ["PORTFOLIO_DB_USER"],
+        "PASSWORD": os.getenv("PORTFOLIO_DB_PASSWORD", ""),
+        "HOST": os.getenv("PORTFOLIO_DB_HOST", "127.0.0.1"),
+        "PORT": os.getenv("PORTFOLIO_DB_PORT", "3306"),
+        "OPTIONS": {"charset": "utf8mb4", "init_command": "SET sql_mode='STRICT_TRANS_TABLES'"},
+    }
+
+TRUST_GEO_HEADERS = os.getenv("PORTFOLIO_TRUST_GEO_HEADERS") == "1"
+ADMIN_NOTIFICATION_EMAIL = os.getenv("ADMIN_NOTIFICATION_EMAIL", "")
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "portfolio@localhost")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "1") == "1"
+EMAIL_TIMEOUT = 15
+
+JOB_IMPORT_OPENAI_API_KEY = os.getenv("JOB_IMPORT_OPENAI_API_KEY", "")
+JOB_IMPORT_OPENAI_MODEL = os.getenv("JOB_IMPORT_OPENAI_MODEL", "gpt-4.1-mini")

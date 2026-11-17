@@ -1,0 +1,227 @@
+from pathlib import Path
+
+from django import forms
+from django.contrib import admin, messages
+from django.db.models import Count
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.template.response import TemplateResponse
+from django.template.loader import render_to_string
+from django.urls import path, reverse
+from django.utils.html import format_html
+from django.utils.http import content_disposition_header
+from django.views.decorators.http import require_POST
+
+from .job_import import ImportError as JobImportError, import_posting
+from .models import Application, Document, Visitor
+from .notifications import queue_notifications
+
+
+class PortfolioAdmin(admin.AdminSite):
+    site_header = "Sujil Mani"
+    site_title = "Portfolio admin"
+    index_title = "Dashboard"
+    index_template = "admin/dashboard.html"
+
+    def index(self, request, extra_context=None):
+        locations = Visitor.objects.values("country", "region").annotate(visitors=Count("pk"))
+        countries = Visitor.objects.values("country").annotate(visitors=Count("pk"))
+        applications = Application.objects.all()
+        return super().index(request, {
+            "visitor_count": Visitor.objects.count(),
+            "countries": countries.order_by("-visitors", "country"),
+            "locations": locations.exclude(region="").order_by("-visitors", "country", "region"),
+            "active_count": applications.exclude(stage__in=Application.CLOSED).count(),
+            "application_count": applications.count(),
+            **(extra_context or {}),
+        })
+
+
+site = PortfolioAdmin(name="admin")
+
+
+class ApplicationForm(forms.ModelForm):
+    cv = forms.FileField(label="CV", required=False, help_text="PDF or DOCX, up to 5 MB.")
+    cover = forms.FileField(label="Cover letter", required=False, help_text="PDF or DOCX, up to 5 MB.")
+    job_desc = forms.FileField(label="Job description file", required=False, help_text="PDF or DOCX, up to 5 MB.")
+
+    class Meta:
+        model = Application
+        fields = "__all__"
+
+    def clean(self):
+        cleaned = super().clean()
+        for field, _ in Document.Kind.choices:
+            upload = cleaned.get(field)
+            if not upload:
+                continue
+            extension = Path(upload.name).suffix.lower()
+            signature = upload.read(5)
+            upload.seek(0)
+            valid = (extension == ".pdf" and signature == b"%PDF-") or (
+                extension == ".docx" and signature.startswith(b"PK\x03\x04")
+            )
+            if upload.size > 5 * 1024 * 1024 or not valid:
+                self.add_error(field, "Upload a PDF or DOCX file up to 5 MB.")
+        return cleaned
+
+
+@admin.register(Application, site=site)
+class ApplicationAdmin(admin.ModelAdmin):
+    form = ApplicationForm
+    change_form_template = "admin/application_form.html"
+    actions = ("edit_selected_application",)
+
+    class Media:
+        js = ("job-import.js", "application-documents.js")
+
+    list_display = (
+        "role_link", "company", "stage_badge", "job_location", "work_arrangement",
+        "office_days_per_week", "interview_at", "updated_at",
+    )
+    list_display_links = None
+    list_filter = ("stage", "work_arrangement")
+    search_fields = ("role", "company", "job_location", "posting_details")
+    ordering = ("-updated_at",)
+    readonly_fields = ("saved_documents",)
+    fieldsets = (
+        ("Application", {"fields": ("role", "company", "stage", "posting_url", "posting_details", "notes")}),
+        ("Location and work arrangement", {
+            "fields": ("job_location", "work_arrangement", "office_days_per_week"),
+        }),
+        ("Company", {"fields": ("company_website", "company_details")}),
+        ("Interview", {"fields": ("interview_at", "interview_details", "prep_questions")}),
+        ("Documents", {"fields": ("saved_documents", "job_desc", "cv", "cover")}),
+    )
+
+    @admin.action(permissions=["change"], description="Edit selected application")
+    def edit_selected_application(self, request, queryset):
+        selected = list(queryset[:2])
+        if request.POST.get("select_across") == "1" or len(selected) != 1:
+            self.message_user(request, "Select one application to edit.", level=messages.WARNING)
+            return None
+        application = selected[0]
+        if not self.has_change_permission(request, application):
+            raise Http404
+        return HttpResponseRedirect(reverse("admin:backoffice_application_change", args=[application.pk]))
+
+    @admin.display(description="Role", ordering="role")
+    def role_link(self, obj):
+        return format_html('<a href="{}">{}</a>', reverse("admin:application_detail", args=[obj.pk]), obj.role)
+
+    def changelist_view(self, request, extra_context=None):
+        return super().changelist_view(request, {"title": "Job applications", **(extra_context or {})})
+
+    def progress_context(self, obj):
+        stages = [(value, label) for value, label in Application.Stage.choices
+                  if value not in {Application.Stage.REJECTED, Application.Stage.WITHDRAWN}]
+        current = next((index for index, (value, _) in enumerate(stages) if value == obj.stage), None)
+        return {
+            "application_progress": [
+                {
+                    "label": label,
+                    "state": "closed" if current is None else (
+                        "current" if index == current else "earlier" if index < current else "upcoming"
+                    ),
+                }
+                for index, (_, label) in enumerate(stages)
+            ],
+            "application_stage_label": obj.get_stage_display(),
+        }
+
+    def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
+        if obj and not context.get("is_popup"):
+            context.update(self.progress_context(obj))
+        return super().render_change_form(request, context, add, change, form_url, obj)
+
+    @admin.display(description="Stage", ordering="stage")
+    def stage_badge(self, obj):
+        return format_html(
+            '<span class="application-stage" data-stage="{}">{}</span>',
+            obj.stage, obj.get_stage_display(),
+        )
+
+    @admin.display(description="Saved documents")
+    def saved_documents(self, obj):
+        return render_to_string("admin/application_documents.html", {
+            "documents": obj.documents.defer("content") if obj and obj.pk else (),
+            "show_remove": True,
+        })
+
+    def get_urls(self):
+        return [
+            path("<int:pk>/detail/", self.admin_site.admin_view(self.detail), name="application_detail"),
+            path("document/<int:pk>/preview/", self.admin_site.admin_view(self.preview_document),
+                 name="preview_application_document"),
+            path("document/<int:pk>/remove/", self.admin_site.admin_view(require_POST(self.remove_document)),
+                 name="remove_application_document"),
+            path("import-posting/", self.admin_site.admin_view(require_POST(self.import_job)), name="import_job_posting"),
+            path("document/<int:pk>/", self.admin_site.admin_view(self.download), name="application_document"),
+            *super().get_urls(),
+        ]
+
+    def detail(self, request, pk):
+        application = self.get_object(request, str(pk))
+        if application is None or not self.has_view_or_change_permission(request, application):
+            raise Http404
+        request.current_app = self.admin_site.name
+        return TemplateResponse(request, "admin/application_detail.html", {
+            **self.admin_site.each_context(request),
+            **self.progress_context(application),
+            "title": application.role,
+            "application": application,
+            "documents": application.documents.defer("content"),
+            "can_edit": self.has_change_permission(request, application),
+        })
+
+    def remove_document(self, request, pk):
+        document = Document.objects.select_related("application").defer("content").filter(pk=pk).first()
+        if document is None or not self.has_change_permission(request, document.application):
+            raise Http404
+        document.delete()
+        return JsonResponse({"removed": True})
+
+    def import_job(self, request):
+        if not (self.has_add_permission(request) or self.has_change_permission(request)):
+            return JsonResponse({"error": "You do not have permission to import applications."}, status=403)
+        url = request.POST.get("url", "").strip()
+        if not url or len(url) > Application._meta.get_field("posting_url").max_length:
+            return JsonResponse({"error": "Enter a valid public HTTPS posting URL."}, status=400)
+        try:
+            return JsonResponse({"fields": import_posting(url)})
+        except JobImportError as error:
+            return JsonResponse({"error": str(error)}, status=422)
+
+    def download(self, request, pk):
+        document = Document.objects.select_related("application").filter(pk=pk).first()
+        if document is None or not self.has_view_or_change_permission(request, document.application):
+            raise Http404
+        response = HttpResponse(document.content, content_type="application/octet-stream")
+        response["Content-Disposition"] = content_disposition_header(True, document.filename)
+        return response
+
+    def preview_document(self, request, pk):
+        document = Document.objects.select_related("application").filter(pk=pk).first()
+        if (document is None or not self.has_view_or_change_permission(request, document.application)
+                or not document.filename.lower().endswith(".pdf") or not document.content.startswith(b"%PDF-")):
+            raise Http404
+        response = HttpResponse(document.content, content_type="application/pdf")
+        response["Content-Disposition"] = content_disposition_header(False, document.filename)
+        response["X-Content-Type-Options"] = "nosniff"
+        response["X-Frame-Options"] = "SAMEORIGIN"
+        return response
+
+    def save_model(self, request, obj, form, change):
+        # Django's change form wraps this save in a transaction.
+        previous = Application.objects.select_for_update().filter(pk=obj.pk).first() if change else None
+        super().save_model(request, obj, form, change)
+        queue_notifications(obj, previous)
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        for field, _ in Document.Kind.choices:
+            upload = form.cleaned_data.get(field)
+            documents = form.instance.documents
+            if upload:
+                documents.update_or_create(
+                    kind=field, defaults={"filename": upload.name[:200], "content": upload.read()},
+                )

@@ -3,6 +3,9 @@ from django.shortcuts import render
 from django.urls import path, reverse
 from django.views.generic.base import RedirectView
 
+from backoffice.admin import site
+from backoffice.analytics import analytics
+
 from .seo import SITE_ORIGIN, page_metadata, robots_txt
 
 
@@ -89,6 +92,8 @@ def sitemap(request):
 
 
 urlpatterns = [
+    path('admin/', site.urls),
+    path('analytics/consent/', analytics, name='visitor_analytics'),
     path("google223f70130798bf8b.html", google_site_verification),
     path("sitemap.xml/google223f70130798bf8b.html", google_site_verification),
     path("robots.txt", robots_txt, name="robots"),

@@ -1,0 +1,10 @@
+<div id="visitor-consent" hidden>
+  <form action="{% url 'visitor_analytics' %}" method="post">
+    {% csrf_token %}
+    <p>Allow an analytics cookie to count your visit and estimate your country or region?</p>
+    <button type="submit" value="allow">Allow analytics</button>
+    <button type="submit" value="decline">Decline</button>
+    <p role="status"></p>
+  </form>
+</div>
+<button id="visitor-settings" type="button" hidden>Analytics preferences</button>

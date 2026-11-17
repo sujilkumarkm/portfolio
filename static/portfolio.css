@@ -1221,3 +1221,27 @@ html:has(.certificate-gallery[open]) {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+#visitor-consent {
+    position: fixed;
+    z-index: 40;
+    bottom: 1rem;
+    inset-inline-start: 1rem;
+    width: min(calc(100% - 2rem), 28rem);
+    padding: 1rem;
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: .75rem;
+    box-shadow: 0 8px 24px #0008;
+}
+#visitor-consent button, #visitor-settings {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+    padding: .35rem .75rem;
+    border-radius: .45rem;
+    cursor: pointer;
+}
+#visitor-consent button { margin-top: .65rem; }
+#visitor-consent button[value=allow] { background: var(--accent); color: var(--bg); }
+#visitor-settings { margin: .5rem var(--gutter) 1rem; }

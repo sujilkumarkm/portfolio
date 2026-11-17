@@ -1,0 +1,16 @@
+  {% if application_progress %}
+    <section class="application-progress" aria-labelledby="application-progress-title">
+      <div class="application-progress-heading">
+        <h2 id="application-progress-title">Application progress</h2>
+        <span class="application-current-stage">Current stage <strong>{{ application_stage_label }}</strong></span>
+      </div>
+      <ol>
+        {% for step in application_progress %}
+          <li data-state="{{ step.state }}"{% if step.state == "current" %} aria-current="step"{% endif %}>
+            <span class="application-progress-node" aria-hidden="true"></span>
+            <span>{{ step.label }}</span>
+          </li>
+        {% endfor %}
+      </ol>
+    </section>
+  {% endif %}

@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+<div class="dashboard-heading">
+  <div><h1>Portfolio dashboard</h1><p>Visitor locations and your job search.</p></div>
+  <a class="dashboard-action" href="{% url 'admin:backoffice_application_changelist' %}">Job applications →</a>
+</div>
+<div class="dashboard-metrics">
+  <div><span>Unique visitors</span><strong>{{ visitor_count }}</strong></div>
+  <div><span>Active applications</span><strong>{{ active_count }}</strong></div>
+  <div><span>Total applications</span><strong>{{ application_count }}</strong></div>
+</div>
+<div class="dashboard-locations">
+  <section>
+    <h2>Visitors by country</h2>
+    <table><thead><tr><th scope="col">Country</th><th scope="col">Visitors</th></tr></thead>
+    <tbody>{% for row in countries %}
+      <tr><td>{% if row.country %}<span data-country="{{ row.country }}">{{ row.country }}</span>{% else %}Unknown{% endif %}</td><td>{{ row.visitors }}</td></tr>
+    {% empty %}<tr><td colspan="2">No visitors recorded yet.</td></tr>{% endfor %}</tbody></table>
+  </section>
+  <section>
+    <h2>Visitors by region</h2>
+    <table><thead><tr><th scope="col">Region</th><th scope="col">Visitors</th></tr></thead>
+    <tbody>{% for row in locations %}
+      <tr><td>{{ row.region }} · <span data-country="{{ row.country }}">{{ row.country }}</span></td><td>{{ row.visitors }}</td></tr>
+    {% empty %}<tr><td colspan="2">No regional data yet.</td></tr>{% endfor %}</tbody></table>
+  </section>
+</div>
+{% endblock %}
+{% block extrabody %}
+{{ block.super }}
+<script>
+  if (typeof Intl.DisplayNames === "function") {
+    const names = new Intl.DisplayNames([document.documentElement.lang || "en"], {type: "region"});
+    document.querySelectorAll("[data-country]").forEach(label => {
+      label.textContent = names.of(label.dataset.country);
+    });
+  }
+</script>
+{% endblock %}

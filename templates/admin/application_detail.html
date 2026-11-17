@@ -1,0 +1,46 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Dashboard</a> ›
+  <a href="{% url 'admin:backoffice_application_changelist' %}">Job applications</a> › {{ application.role }}
+</div>
+{% endblock %}
+
+{% block content_subtitle %}<h2>{{ application.company }}</h2>{% endblock %}
+
+{% block content %}
+<div class="application-detail">
+  {% if can_edit %}<a class="dashboard-action" href="{% url 'admin:backoffice_application_change' application.pk %}">Edit application</a>{% endif %}
+  {% include "admin/application_progress.html" %}
+  <div class="application-detail-grid">
+    <section>
+      <h2>Job details</h2>
+      <dl>
+        <dt>Job / office location</dt><dd>{{ application.job_location|default:"—" }}</dd>
+        <dt>Work arrangement</dt><dd>{{ application.get_work_arrangement_display|default:"—" }}</dd>
+        <dt>Office days per week</dt><dd>{{ application.office_days_per_week|default_if_none:"—" }}</dd>
+        {% if application.posting_url %}<dt>Job posting</dt><dd><a href="{{ application.posting_url }}">Open posting</a></dd>{% endif %}
+        {% if application.company_website %}<dt>Company website</dt><dd><a href="{{ application.company_website }}">Open website</a></dd>{% endif %}
+        <dt>Last updated</dt><dd>{{ application.updated_at }}</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Interview</h2>
+      <dl><dt>Scheduled for</dt><dd>{{ application.interview_at|default_if_none:"—" }}</dd></dl>
+      {% if application.interview_details %}{{ application.interview_details|linebreaks }}{% endif %}
+      {% if application.prep_questions %}<h3>Preparation questions</h3>{{ application.prep_questions|linebreaks }}{% endif %}
+    </section>
+  </div>
+  <section class="application-detail-section"><h2>Documents</h2>{% include "admin/application_documents.html" %}</section>
+  {% if application.posting_details %}<section class="application-detail-section"><h2>Posting details</h2>{{ application.posting_details|linebreaks }}</section>{% endif %}
+  {% if application.company_details %}<section class="application-detail-section"><h2>Company details</h2>{{ application.company_details|linebreaks }}</section>{% endif %}
+  {% if application.notes %}<section class="application-detail-section"><h2>Notes</h2>{{ application.notes|linebreaks }}</section>{% endif %}
+</div>
+{% endblock %}
+
+{% block extrabody %}
+  {{ block.super }}
+  {% include "admin/document_preview.html" %}
+  <script src="{% static 'application-documents.js' %}" defer></script>
+{% endblock %}

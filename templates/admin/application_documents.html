@@ -1,0 +1,12 @@
+{% for document in documents %}
+  <div class="saved-document">
+    {% if document.filename|lower|slice:"-4:" == ".pdf" %}
+      <button type="button" data-preview-document="{% url 'admin:preview_application_document' document.pk %}"
+        data-document-title="{{ document.filename }}">{% if show_remove %}Preview PDF{% else %}{{ document.get_kind_display }} · {{ document.filename }}{% endif %}</button>
+    {% endif %}
+    <a href="{% url 'admin:application_document' document.pk %}" download>{{ document.get_kind_display }} ({{ document.filename }})</a>
+    {% if show_remove %}
+      <button type="button" data-remove-document="{% url 'admin:remove_application_document' document.pk %}">Remove {{ document.get_kind_display }}</button>
+    {% endif %}
+  </div>
+{% empty %}None{% endfor %}
