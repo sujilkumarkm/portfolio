@@ -125,16 +125,20 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Enable MySQL/MariaDB by setting the database user and connection details.
-if os.getenv("PORTFOLIO_DB_USER"):
-    DATABASES["default"] = {
+def mysql_database(user, default_host="127.0.0.1"):
+    return {
         "ENGINE": "django.db.backends.mysql",
         "NAME": os.getenv("PORTFOLIO_DB_NAME", "suji1991_sujil_portfolio"),
-        "USER": os.environ["PORTFOLIO_DB_USER"],
+        "USER": user,
         "PASSWORD": os.getenv("PORTFOLIO_DB_PASSWORD", ""),
-        "HOST": os.getenv("PORTFOLIO_DB_HOST", "127.0.0.1"),
+        "HOST": os.getenv("PORTFOLIO_DB_HOST", default_host),
         "PORT": os.getenv("PORTFOLIO_DB_PORT", "3306"),
         "OPTIONS": {"charset": "utf8mb4", "init_command": "SET sql_mode='STRICT_TRANS_TABLES'"},
     }
+
+
+if os.getenv("PORTFOLIO_DB_USER"):
+    DATABASES["default"] = mysql_database(os.environ["PORTFOLIO_DB_USER"])
 
 TRUST_GEO_HEADERS = os.getenv("PORTFOLIO_TRUST_GEO_HEADERS") == "1"
 ADMIN_NOTIFICATION_EMAIL = os.getenv("ADMIN_NOTIFICATION_EMAIL", "")

@@ -21,6 +21,38 @@ The default MariaDB database is `suji1991_sujil_portfolio`. Use
 connection details. Without `PORTFOLIO_DB_USER`, Django uses the checkout's
 SQLite database.
 
+## Mochahost production
+
+Production defaults to the cPanel MySQL user `suji1991_portfolio`, which
+already has grants on `suji1991_sujil_portfolio`. Set the Python application's startup file to
+`passenger_wsgi.py` and its entry point to `application`. The existing
+production configuration uses `https://sujil.net` as the canonical URL.
+
+Set these variables in the Python application environment and make the same
+values available in the terminal used for management commands:
+
+| Variable | Value |
+| --- | --- |
+| `DJANGO_SECRET_KEY` | A private, stable Django secret key |
+| `PORTFOLIO_DB_NAME` | `suji1991_sujil_portfolio` |
+| `PORTFOLIO_DB_USER` | `suji1991_portfolio` (production default) |
+| `PORTFOLIO_DB_PASSWORD` | The MySQL user's password |
+| `PORTFOLIO_DB_HOST` | `localhost` (production default, uses the local Unix socket on Linux) |
+| `PORTFOLIO_DB_PORT` | `3306` (used for TCP connections) |
+
+From the deployed checkout, with the application's Python environment active:
+
+```sh
+python -m pip install -r requirements.txt
+python manage.py check --settings=portfolio_site.production
+python manage.py migrate --settings=portfolio_site.production
+python manage.py createsuperuser --settings=portfolio_site.production
+```
+
+The migrations create the tables in the empty database. Run
+`createsuperuser` for the initial admin account. Restart the Python application
+in cPanel and verify the homepage and `/admin/` over HTTPS.
+
 ### Visitor analytics
 
 The public site's analytics prompt appears until a browser saves a preference.
