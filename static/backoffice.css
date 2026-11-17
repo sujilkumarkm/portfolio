@@ -261,3 +261,13 @@ a.dashboard-action { color: #241208; background: #ff9a4d; border-radius: .6rem; 
   border-color: #654440;
   color: #ecc2bd;
 }
+
+.dashboard-widgets { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1rem; margin-top: 1rem; }
+.dashboard-widget { box-sizing: border-box; background: #15110f; border: 1px solid #392820; border-radius: .85rem; padding: 1.25rem; width: 46%; min-width: min(240px, 100%); max-width: 100%; min-height: 150px; resize: both; overflow: auto; }
+.dashboard-widget.metric { width: 31%; }
+.dashboard-widget strong { display: block; font-size: 2.5rem; color: #ffc595; }
+.dashboard-widget a { display: block; }
+.dashboard-widget a:hover { text-decoration: underline; }
+.dashboard-widget table { width: 100%; }
+.widget-handle { display: block; cursor: grab; font-size: .75rem; margin-bottom: .6rem; }
+@media (max-width: 700px) { .dashboard-widget, .dashboard-widget.metric { width: 100%; } }

@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, URLValidator
 from django.db import models
+from django.conf import settings
 
 
 class Visitor(models.Model):
@@ -84,6 +85,7 @@ class Document(models.Model):
 
 
 class Notification(models.Model):
+    category = models.CharField(max_length=25, default="application_updates")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     subject = models.CharField(max_length=450)
     body = models.TextField()
@@ -91,3 +93,22 @@ class Notification(models.Model):
     expires_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
     cancelled = models.BooleanField(default=False)
+
+
+class MemberPreferences(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    new_jobs = models.BooleanField(default=False)
+    application_updates = models.BooleanField(default=False)
+    interviews = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "Email notification preferences"
+
+
+class NotificationDelivery(models.Model):
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name="deliveries")
+    email = models.EmailField()
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["notification", "email"], name="unique_notification_recipient")]

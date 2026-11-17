@@ -32,12 +32,21 @@ def queue_notifications(application, previous):
     body.extend(["Example interview questions", *(f"- {question}" for question in questions if question.strip())])
     content = "\n\n".join(body)
 
-    if previous and previous.stage != application.stage:
+    if previous is None:
+        Notification.objects.create(application=application, category="new_jobs",
+            subject=f"New job: {application}", body=content, due_at=now)
+    elif any(getattr(previous, field.name) != getattr(application, field.name)
+             for field in Application._meta.fields if field.name not in {"id", "updated_at"}):
         Notification.objects.create(
             application=application, subject=f"Application update: {application}",
-            body=f"{previous.get_stage_display()} → {application.get_stage_display()}\n\n{content}",
+            body=content,
             due_at=now,
         )
+
+    if previous and any(getattr(previous, field) != getattr(application, field)
+                        for field in ("interview_at", "interview_details", "prep_questions")):
+        Notification.objects.create(application=application, category="interviews",
+            subject=f"Interview update: {application}", body=content, due_at=now)
 
     pending = Notification.objects.filter(application=application, sent_at=None, expires_at__isnull=False)
     if application.stage in Application.CLOSED or not interview or interview <= now:
@@ -54,6 +63,6 @@ def queue_notifications(application, previous):
     local_date = timezone.localtime(interview).date()
     reminder = timezone.make_aware(datetime.combine(local_date - timedelta(days=1), time(9)))
     Notification.objects.create(
-        application=application, subject=f"Interview reminder: {application}",
+        application=application, category="interviews", subject=f"Interview reminder: {application}",
         body=content, due_at=max(now, reminder), expires_at=interview,
     )

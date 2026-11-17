@@ -1,25 +1,26 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
 {% block breadcrumbs %}{% endblock %}
 {% block content %}
 <div class="dashboard-heading">
   <div><h1>Portfolio dashboard</h1><p>Visitor locations and your job search.</p></div>
   <a class="dashboard-action" href="{% url 'admin:backoffice_application_changelist' %}">Job applications →</a>
 </div>
-<div class="dashboard-metrics">
-  <div><span>Unique visitors</span><strong>{{ visitor_count }}</strong></div>
-  <div><span>Active applications</span><strong>{{ active_count }}</strong></div>
-  <div><span>Total applications</span><strong>{{ application_count }}</strong></div>
-</div>
-<div class="dashboard-locations">
-  <section>
-    <h2>Visitors by country</h2>
+<button type="button" id="reset-layout">Reset widget layout</button>
+<div class="dashboard-widgets" data-layout-key="portfolio-widgets-{{ request.user.pk }}">
+  <section class="dashboard-widget metric" data-widget="visitors"><a href="{% url 'admin:backoffice_visitor_changelist' %}"><span>Unique visitors</span><strong>{{ visitor_count }}</strong></a></section>
+  <section class="dashboard-widget metric" data-widget="active"><a href="{{ active_url }}"><span>Active applications</span><strong>{{ active_count }}</strong></a></section>
+  <section class="dashboard-widget metric" data-widget="applications"><a href="{% url 'admin:backoffice_application_changelist' %}"><span>Total applications</span><strong>{{ application_count }}</strong></a></section>
+
+  <section class="dashboard-widget" data-widget="countries">
+    <h2><a href="{% url 'admin:backoffice_visitor_changelist' %}">Visitors by country →</a></h2>
     <table><thead><tr><th scope="col">Country</th><th scope="col">Visitors</th></tr></thead>
     <tbody>{% for row in countries %}
       <tr><td>{% if row.country %}<span data-country="{{ row.country }}">{{ row.country }}</span>{% else %}Unknown{% endif %}</td><td>{{ row.visitors }}</td></tr>
     {% empty %}<tr><td colspan="2">No visitors recorded yet.</td></tr>{% endfor %}</tbody></table>
   </section>
-  <section>
-    <h2>Visitors by region</h2>
+  <section class="dashboard-widget" data-widget="regions">
+    <h2><a href="{% url 'admin:backoffice_visitor_changelist' %}">Visitors by region →</a></h2>
     <table><thead><tr><th scope="col">Region</th><th scope="col">Visitors</th></tr></thead>
     <tbody>{% for row in locations %}
       <tr><td>{{ row.region }} · <span data-country="{{ row.country }}">{{ row.country }}</span></td><td>{{ row.visitors }}</td></tr>
@@ -29,6 +30,7 @@
 {% endblock %}
 {% block extrabody %}
 {{ block.super }}
+<script src="{% static 'dashboard-widgets.js' %}" defer></script>
 <script>
   if (typeof Intl.DisplayNames === "function") {
     const names = new Intl.DisplayNames([document.documentElement.lang || "en"], {type: "region"});

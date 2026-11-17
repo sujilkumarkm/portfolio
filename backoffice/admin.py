@@ -32,6 +32,7 @@ class PortfolioAdmin(admin.AdminSite):
             "locations": locations.exclude(region="").order_by("-visitors", "country", "region"),
             "active_count": applications.exclude(stage__in=Application.CLOSED).count(),
             "application_count": applications.count(),
+            "active_url": reverse("admin:backoffice_application_changelist") + "?" + "stage__in=" + ",".join(v for v, _ in Application.Stage.choices if v not in Application.CLOSED),
             **(extra_context or {}),
         })
 
@@ -225,3 +226,41 @@ class ApplicationAdmin(admin.ModelAdmin):
                 documents.update_or_create(
                     kind=field, defaults={"filename": upload.name[:200], "content": upload.read()},
                 )
+
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+from .models import MemberPreferences
+
+
+class PreferencesInline(admin.StackedInline):
+    model = MemberPreferences
+    can_delete = False
+    extra = 1
+    max_num = 1
+
+
+@admin.register(get_user_model(), site=site)
+class MemberAdmin(UserAdmin):
+    inlines = (PreferencesInline,)
+    list_display = ("username", "email", "is_staff", "is_active")
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    has_add_permission = has_view_permission
+    has_change_permission = has_view_permission
+    has_delete_permission = has_view_permission
+
+
+@admin.register(Visitor, site=site)
+class VisitorAdmin(admin.ModelAdmin):
+    list_display = ("country", "region", "first_seen")
+    list_filter = ("country", "region")
+    def has_add_permission(self, request):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False

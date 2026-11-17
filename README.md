@@ -104,3 +104,44 @@ For production, set `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`,
 Schedule `python manage.py send_interview_emails` every five minutes using the
 same production settings and database connection as the website. Apply
 migrations and create a production administrator separately.
+
+
+### Members and subscribed notifications
+
+A superuser can add members under **Users** in the admin. Set a valid email,
+activate **Staff status**, set a password, and grant the appropriate application
+and visitor view permissions (and add/change permissions if needed). Save the
+user, then open their record and select **Email notification preferences**:
+**New jobs**, **Application updates**, and/or **Interviews**. Only active staff
+members receive subscribed emails. User management is restricted to superusers.
+Preferences apply across the application's job list. New jobs and edits saved
+through admin enter the queue; direct database changes do not trigger mail.
+
+Keep the existing `send_interview_emails` command scheduled every five minutes.
+It now sends all three categories. Failed recipients remain queued; successful
+recipients are recorded individually. A crash after SMTP accepts a message but
+before the database commits can still cause a duplicate on retry.
+`ADMIN_NOTIFICATION_EMAIL`, when set, remains an additional recipient for every
+category; unset it if all recipients should be managed by subscriptions.
+
+Before production, apply migrations and configure SMTP as above. Run:
+
+```sh
+python manage.py test backoffice
+python manage.py migrate --settings=portfolio_site.production
+python manage.py test_notification_email your-test-address@example.com --settings=portfolio_site.production
+```
+
+The test command verifies SMTP acceptance. Confirm the message arrives in the
+inbox, then test a subscribed member with a new job, an application stage change,
+and an interview change, running the queue command after each save. Check an
+unsubscribed account receives none. Do this before switching production traffic.
+
+### Dashboard widgets
+
+Each widget links to its underlying application or visitor list; active
+applications opens a filtered list. Drag **Move widget** to reorder, or focus
+that button and use Left/Right arrows. Drag the bottom-right resize corner to
+change width and height. Layout is saved per user in the current browser.
+**Reset widget layout** restores defaults. New widgets can use the same
+`dashboard-widget` class and a stable unique `data-widget` identifier.
