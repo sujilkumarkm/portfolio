@@ -10,3 +10,5 @@
   <script src="{% static 'backoffice-navigation.js' %}" defer></script>
 {% endif %}
 {% endblock %}
+
+{% block footer %}{{ block.super }}<div style="padding: 1rem 2rem; font-size: .8rem;"><a href="https://db-ip.com">IP Geolocation by DB-IP</a></div>{% endblock %}

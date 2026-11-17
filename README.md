@@ -177,3 +177,41 @@ five different consenting browsers located in GB count as five UK visitors;
 repeat page loads add visits without adding unique visitors. Clearing cookies
 can create another unique record. Counts represent the latest known location
 of each browser. Deploy this update only with the matching consent text.
+
+
+### Fix Unknown countries without Cloudflare or a MaxMind account
+
+Run in the activated production Python environment, with the production
+application variables available:
+
+```sh
+python -m pip install -r requirements.txt
+python manage.py update_geoip --settings=portfolio_site.production
+python manage.py resolve_visitor_countries --settings=portfolio_site.production
+```
+
+Restart the cPanel Python app, then refresh Visitors and the map. The installer
+puts DB-IP Country Lite at `var/geoip-country.mmdb` by default. A custom
+`GEOIP_DATABASE_PATH` overrides this location; use the same setting in the
+terminal and web app. The directory must be writable for the updater and
+readable by the web app. The download needs outbound HTTPS. No visitor IPs
+are sent to DB-IP: queries run against the downloaded database locally.
+
+Run `update_geoip` monthly using cPanel cron and the same Python environment.
+Downloads are validated before atomic replacement; a failed download leaves
+the previous database intact. The backfill fills only missing countries and
+does not increase visits or overwrite known countries. DB-IP Country Lite
+provides country only; region can stay blank. Local data is ignored by Git
+and must be installed separately on each server. Attribution appears in admin.
+DB-IP data: https://db-ip.com/db/download/ip-to-country-lite (CC BY 4.0).
+
+
+### Upcoming interviews on the dashboard
+
+The dashboard shows the next three future scheduled interviews, earliest first,
+for members allowed to view/change applications. Closed applications and past
+scheduled times are excluded on page load. Cards link to job details and show
+employer, role, stage, work arrangement, location, and the full scheduled date
+and time in Europe/Dublin. Relative labels refresh every 30 seconds in the
+browser; reload the dashboard to fetch newly scheduled or rescheduled interviews.
+Motion follows the browser's reduced-motion preference. No migration is needed.

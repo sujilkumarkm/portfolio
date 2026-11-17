@@ -1,10 +1,30 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
 {% block breadcrumbs %}{% endblock %}
 {% block content %}
 <div class="dashboard-heading">
   <div><h1>Portfolio dashboard</h1><p>Visitor locations and your job search.</p></div>
   <a class="dashboard-action" href="{% url 'admin:backoffice_application_changelist' %}">Job applications →</a>
 </div>
+{% if can_view_interviews %}
+<section class="upcoming-interviews" aria-labelledby="upcoming-title">
+  <div class="upcoming-heading"><h2 id="upcoming-title">Next interviews</h2><span>Your next three scheduled conversations · Europe/Dublin</span></div>
+  <ol class="interview-cards">
+    {% for interview in upcoming_interviews %}
+    <li class="interview-card">
+      <a href="{% url 'admin:application_detail' interview.pk %}">
+        <div class="interview-card-top"><span class="interview-stage">{{ interview.get_stage_display }}</span>{% if forloop.first %}<span class="interview-next">Up next</span>{% endif %}</div>
+        <h3>{{ interview.company }}</h3><p class="interview-role">{{ interview.role }}</p>
+        <p class="interview-arrangement">{{ interview.get_work_arrangement_display|default:"Work arrangement not specified" }}{% if interview.job_location %} · {{ interview.job_location }}{% endif %}</p>
+        <time datetime="{{ interview.interview_at|date:'c' }}" class="interview-relative">In {{ interview.interview_at|timeuntil }}</time>
+        <p class="interview-date">{{ interview.interview_at|date:"l, j F Y" }} at {{ interview.interview_at|date:"H:i T" }}</p>
+        <span class="interview-details">View interview details <span aria-hidden="true">→</span></span>
+      </a>
+    </li>
+    {% empty %}<li class="interview-empty">No upcoming interviews scheduled. Add a date and time to an application to see it here.</li>{% endfor %}
+  </ol>
+</section>
+{% endif %}
 <div class="dashboard-metrics">
   <div><span>Unique visitors</span><strong><a class="dashboard-number-link" href="{% url 'admin:backoffice_visitor_changelist' %}" aria-label="View unique visitors">{{ visitor_count }}</a></strong></div>
   <div><span>Active applications</span><strong><a class="dashboard-number-link" href="{{ active_url }}" aria-label="View active applications">{{ active_count }}</a></strong></div>
@@ -29,6 +49,7 @@
 {% endblock %}
 {% block extrabody %}
 {{ block.super }}
+<script src="{% static 'upcoming-interviews.js' %}" defer></script>
 <script>
   if (typeof Intl.DisplayNames === "function") {
     const names = new Intl.DisplayNames([document.documentElement.lang || "en"], {type: "region"});

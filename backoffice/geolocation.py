@@ -19,12 +19,13 @@ def locate(address):
     if not address or not settings.GEOIP_DATABASE_PATH:
         return "", ""
     try:
-        import geoip2.database
-        with geoip2.database.Reader(settings.GEOIP_DATABASE_PATH) as reader:
-            if reader.metadata().database_type.endswith("City"):
-                result = reader.city(address)
-                return result.country.iso_code or "", result.subdivisions.most_specific.name or ""
-            return reader.country(address).country.iso_code or "", ""
+        import maxminddb
+        with maxminddb.open_database(str(settings.GEOIP_DATABASE_PATH)) as reader:
+            result = reader.get(address) or {}
+            country = result.get("country", {}).get("iso_code", "")
+            subdivisions = result.get("subdivisions", [])
+            region = subdivisions[-1].get("names", {}).get("en", "") if subdivisions else ""
+            return country, region[:100]
     except Exception:
         logger.warning("IP country lookup unavailable; check the GeoIP database configuration.")
         return "", ""

@@ -114,3 +114,64 @@ class VisitorAnalyticsTests(TestCase):
         self.assertEqual(self.client.get(reverse("admin:visitor_map")).status_code, 403)
         self.client.logout()
         self.assertEqual(self.client.get(reverse("admin:visitor_map_data")).status_code, 302)
+
+
+class CountryLookupTests(TestCase):
+    @override_settings(GEOIP_DATABASE_PATH="test.mmdb")
+    def test_country_database_lookup(self):
+        from .geolocation import locate
+        with patch("maxminddb.open_database") as database:
+            database.return_value.__enter__.return_value.get.return_value = {"country": {"iso_code": "IE"}}
+            self.assertEqual(locate("51.186.246.23"), ("IE", ""))
+
+    @override_settings(GEOIP_DATABASE_PATH="test.mmdb")
+    def test_missing_database_does_not_break_consent(self):
+        from .geolocation import locate
+        with patch("maxminddb.open_database", side_effect=FileNotFoundError):
+            self.assertEqual(locate("51.186.246.23"), ("", ""))
+
+    @patch("backoffice.management.commands.resolve_visitor_countries.Path")
+    @patch("backoffice.management.commands.resolve_visitor_countries.locate", return_value=("IE", ""))
+    def test_backfill_preserves_visits_and_known_countries(self, locate, path):
+        visitor = Visitor.objects.create(identifier="unknown-ie", ip_address="51.186.246.23", visits=3)
+        known = Visitor.objects.create(identifier="known-gb", ip_address="1.1.1.1", country="GB")
+        call_command("resolve_visitor_countries", stdout=StringIO())
+        visitor.refresh_from_db(); known.refresh_from_db()
+        self.assertEqual((visitor.country, visitor.visits), ("IE", 3))
+        self.assertEqual(known.country, "GB")
+
+
+from datetime import timedelta
+
+class UpcomingInterviewTests(TestCase):
+    def setUp(self):
+        self.owner = get_user_model().objects.create_superuser("interview-owner", "owner@example.com", "password")
+        self.client.force_login(self.owner)
+
+    def test_next_three_future_open_interviews_in_order(self):
+        now = timezone.now()
+        apps = []
+        for days in [5, 1, 3, 7]:
+            apps.append(Application.objects.create(role=f"Engineer {days}", company=f"Employer {days}",
+                stage=Application.Stage.SECOND, work_arrangement=Application.WorkArrangement.HYBRID,
+                interview_at=now + timedelta(days=days)))
+        Application.objects.create(role="Past", company="Past", interview_at=now-timedelta(hours=1))
+        Application.objects.create(role="Closed", company="Closed", stage=Application.Stage.REJECTED,
+            interview_at=now+timedelta(hours=1))
+        response = self.client.get(reverse("admin:index"))
+        self.assertEqual([app.role for app in response.context["upcoming_interviews"]], ["Engineer 1", "Engineer 3", "Engineer 5"])
+        self.assertContains(response, "Second round")
+        self.assertContains(response, "Hybrid")
+        for app in apps[:3]:
+            self.assertContains(response, reverse("admin:application_detail", args=[app.pk]))
+        self.assertContains(response, 'class="interview-relative"')
+        self.assertContains(response, "Europe/Dublin")
+        self.assertContains(response, 'class="dashboard-metrics"')
+
+    def test_empty_and_permission_states(self):
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(response, "No upcoming interviews scheduled")
+        staff = get_user_model().objects.create_user("no-interview-access", is_staff=True)
+        self.client.force_login(staff)
+        response = self.client.get(reverse("admin:index"))
+        self.assertNotContains(response, 'id="upcoming-title"')

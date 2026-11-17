@@ -8,6 +8,7 @@ from django.template.response import TemplateResponse
 from django.template.loader import render_to_string
 from django.urls import path, reverse
 from django.utils.html import format_html
+from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST
 from django.core.exceptions import PermissionDenied
@@ -50,7 +51,12 @@ class PortfolioAdmin(admin.AdminSite):
         locations = Visitor.objects.values("country", "region").annotate(visitors=Count("pk"))
         countries = Visitor.objects.values("country").annotate(visitors=Count("pk"))
         applications = Application.objects.all()
+        can_view_interviews = request.user.has_perm("backoffice.view_application") or request.user.has_perm("backoffice.change_application")
+        upcoming = applications.filter(interview_at__gte=timezone.now()).exclude(
+            stage__in=Application.CLOSED).order_by("interview_at", "pk")[:3] if can_view_interviews else []
         return super().index(request, {
+            "can_view_interviews": can_view_interviews,
+            "upcoming_interviews": upcoming,
             "visitor_count": Visitor.objects.count(),
             "countries": countries.order_by("-visitors", "country"),
             "locations": locations.exclude(region="").order_by("-visitors", "country", "region"),
@@ -282,6 +288,12 @@ class MemberAdmin(UserAdmin):
 
 @admin.register(Visitor, site=site)
 class VisitorAdmin(admin.ModelAdmin):
+    def changelist_view(self, request, extra_context=None):
+        from django.conf import settings
+        if not settings.TRUST_GEO_HEADERS and (not settings.GEOIP_DATABASE_PATH or not Path(settings.GEOIP_DATABASE_PATH).is_file()):
+            self.message_user(request, "Country lookup is not configured. Run update_geoip on the server, then resolve_visitor_countries to fill existing records.", level=messages.WARNING)
+        return super().changelist_view(request, extra_context)
+
     list_display = ("ip_address", "country", "region", "visits", "first_seen", "last_seen")
     search_fields = ("ip_address", "country", "region")
     readonly_fields = ("identifier", "ip_address", "country", "region", "visits", "first_seen", "last_seen")
