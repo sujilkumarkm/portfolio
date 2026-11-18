@@ -12,9 +12,9 @@ from .seo import SITE_ORIGIN, page_metadata, robots_txt
 def home(request):
     metadata = page_metadata(
         "home",
-        "Sujil Mani | Application Support, Python & Agentic AI",
-        "Explore Sujil Mani's portfolio in Dundalk, Ireland, including application "
-        "support experience, Python and Django projects, and agentic AI research.",
+        "Sujil Mani | Support Engineer in Dundalk, Ireland",
+        "Sujil Mani (Sujil Kumar), application and IT support engineer in Dundalk, Ireland. "
+        "Explore Kaseya experience, web development, data analytics and agentic AI.",
     )
     return render(request, "portfolio.html", metadata)
 
@@ -25,8 +25,8 @@ def software(request):
         "software.html",
         page_metadata(
             "software",
-            "Software | Sujil Mani",
-            "Explore the backend, frontend, delivery tools and platforms in Sujil Mani’s software stack.",
+            "Software & Web Developer | Sujil Mani, Ireland",
+            "Explore Sujil Mani’s software and web development skills in Dundalk, Ireland: Python, Django, Laravel, Vue.js, SQL and data analytics.",
         ),
     )
 
@@ -37,7 +37,7 @@ def ai(request):
         "ai.html",
         page_metadata(
             "ai",
-            "Agentic AI | Sujil Mani",
+            "Sujil Mani | Agentic AI & Automation in Ireland",
             "Explore Sujil Mani’s Career Digital Twin, agent engineering capabilities and applied AI workflows.",
         ),
     )
@@ -49,8 +49,8 @@ def support(request):
         "support.html",
         page_metadata(
             "support",
-            "IT Support | Sujil Mani",
-            "Explore Sujil Mani’s Apple and Microsoft support, device management, and identity and access capabilities.",
+            "Application & IT Support Engineer | Sujil Mani, Dundalk",
+            "Sujil Mani, support engineer in Dundalk, Ireland, with Kaseya experience in application support, IT troubleshooting, endpoint management and access management.",
         ),
     )
 

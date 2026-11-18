@@ -7,7 +7,8 @@
         {
             "@type": "WebSite",
             "@id": "{{ site_origin }}/#website",
-            "url": "{{ page_url }}",
+            "url": "{{ site_origin }}/",
+            "alternateName": ["Sujil", "Sujul", "Sujil Kumar"],
             "name": "{{ site_name }}"
         },
         {
@@ -15,13 +16,19 @@
             "@id": "{{ page_url }}#profile",
             "url": "{{ page_url }}",
             "isPartOf": {"@id": "{{ site_origin }}/#website"},
-            "mainEntity": {"@id": "{{ page_url }}#person"}
+            "mainEntity": {"@id": "{{ site_origin }}/#person"}
         },
         {
             "@type": "Person",
-            "@id": "{{ page_url }}#person",
+            "@id": "{{ site_origin }}/#person",
             "name": "{{ site_name }}",
-            "url": "{{ page_url }}",
+            "url": "{{ site_origin }}/",
+            "alternateName": ["Sujil Kumar", "Sujil", "Sujul"],
+            "jobTitle": "Senior Technical Support Expert",
+            "description": "Application and IT support engineer based in Dundalk, Ireland, with experience in software development, web development, data analytics and agentic AI research. Aspiring CEO.",
+            "homeLocation": {"@type": "Place", "name": "Dundalk, County Louth, Ireland"},
+            "worksFor": {"@type": "Organization", "name": "Kaseya"},
+            "knowsAbout": ["Application support", "IT support", "Software development", "Web development", "Python", "Django", "SQL", "Data analytics", "Agentic AI"],
             "image": "{{ site_origin }}{{ portrait_path }}",
             "sameAs": [
                 "https://github.com/sujilkumarkm",
