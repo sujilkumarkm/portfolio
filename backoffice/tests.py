@@ -9,6 +9,31 @@ from django.utils import timezone
 from .models import Application, MemberPreferences, Notification
 from .notifications import queue_notifications
 
+
+class ApplicationNotesTests(TestCase):
+    def test_long_unicode_notes_are_saved_in_full_on_add_and_edit(self):
+        owner = get_user_model().objects.create_superuser("notes-owner")
+        self.client.force_login(owner)
+        notes = " ".join(["Café", "résumé", "確認", "📌"] * 500)
+        fields = {"role": "Support Analyst", "company": "Example", "stage": Application.Stage.APPLIED}
+
+        response = self.client.post(reverse("admin:backoffice_application_add"), {
+            **fields, "notes": notes, "_save": "Save",
+        })
+        self.assertEqual(response.status_code, 302)
+        application = Application.objects.get()
+        self.assertEqual(application.notes, notes)
+
+        edited_notes = "Updated\n\n" + notes
+        change_url = reverse("admin:backoffice_application_change", args=[application.pk])
+        response = self.client.post(change_url, {
+            **fields, "notes": edited_notes, "_continue": "Save and continue editing",
+        }, follow=True)
+        self.assertRedirects(response, change_url)
+        application.refresh_from_db()
+        self.assertEqual(application.notes, edited_notes)
+
+
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend", ADMIN_NOTIFICATION_EMAIL="")
 class NotificationTests(TestCase):
     def setUp(self):

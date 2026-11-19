@@ -71,9 +71,21 @@ site = PortfolioAdmin(name="admin")
 
 
 class ApplicationForm(forms.ModelForm):
-    cv = forms.FileField(label="CV", required=False, help_text="PDF or DOCX, up to 5 MB.")
-    cover = forms.FileField(label="Cover letter", required=False, help_text="PDF or DOCX, up to 5 MB.")
-    job_desc = forms.FileField(label="Job description file", required=False, help_text="PDF or DOCX, up to 5 MB.")
+    cv = forms.FileField(
+        label="CV", required=False,
+        widget=forms.FileInput(attrs={"accept": ".pdf,.docx"}),
+        help_text="Optional. PDF or DOCX, up to 5 MB.",
+    )
+    cover = forms.FileField(
+        label="Cover letter", required=False,
+        widget=forms.FileInput(attrs={"accept": ".pdf,.docx"}),
+        help_text="Optional. PDF or DOCX, up to 5 MB.",
+    )
+    job_desc = forms.FileField(
+        label="Job description file", required=False,
+        widget=forms.FileInput(attrs={"accept": ".pdf,.docx"}),
+        help_text="Optional. PDF or DOCX, up to 5 MB.",
+    )
 
     class Meta:
         model = Application
@@ -92,7 +104,11 @@ class ApplicationForm(forms.ModelForm):
                 extension == ".docx" and signature.startswith(b"PK\x03\x04")
             )
             if upload.size > 5 * 1024 * 1024 or not valid:
-                self.add_error(field, "Upload a PDF or DOCX file up to 5 MB.")
+                self.add_error(
+                    field,
+                    "The selected file must be a PDF or DOCX up to 5 MB. "
+                    "Choose another file or leave this field empty and save again.",
+                )
         return cleaned
 
 
@@ -121,7 +137,10 @@ class ApplicationAdmin(admin.ModelAdmin):
         }),
         ("Company", {"fields": ("company_website", "company_details")}),
         ("Interview", {"fields": ("interview_at", "interview_details", "prep_questions")}),
-        ("Documents", {"fields": ("saved_documents", "job_desc", "cv", "cover")}),
+        ("Documents", {
+            "fields": ("saved_documents", "job_desc", "cv", "cover"),
+            "classes": ("application-document-fields",),
+        }),
     )
 
     @admin.action(permissions=["change"], description="Edit selected application")

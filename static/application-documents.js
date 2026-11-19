@@ -1,4 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const documentFields = document.querySelector(".application-document-fields");
+    if (documentFields) {
+        const fileInputs = documentFields.querySelectorAll('input[type="file"]');
+        const heading = document.getElementById(documentFields.getAttribute("aria-labelledby"));
+        if (heading && fileInputs.length) {
+            const clearButton = document.createElement("button");
+            clearButton.type = "button";
+            clearButton.className = "button";
+            clearButton.textContent = "Clear document selections";
+            clearButton.addEventListener("click", () => {
+                for (const input of fileInputs) {
+                    input.value = "";
+                }
+            });
+            heading.append(clearButton);
+        }
+    }
+
     const dialog = document.querySelector(".document-preview");
     if (dialog) {
         const frame = dialog.querySelector("iframe");

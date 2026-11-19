@@ -290,3 +290,16 @@ a.dashboard-number-link:focus-visible { outline: 2px solid currentColor; outline
 @keyframes interview-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 950px) { .interview-cards { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .interview-card { animation: none; } .interview-card a { transition: none; } }
+
+.application-document-fields .fieldset-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.application-document-fields .fieldset-heading .button {
+    padding: 0.35rem 0.6rem;
+    font-size: inherit;
+}
