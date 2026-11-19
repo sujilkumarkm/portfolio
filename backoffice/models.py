@@ -128,3 +128,14 @@ class NotificationDelivery(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["notification", "email"], name="unique_notification_recipient")]
+
+
+class AppEvent(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    level = models.CharField(max_length=10, default="INFO")
+    category = models.CharField(max_length=30, default="activity")
+    message = models.CharField(max_length=1000)
+    actor_id = models.PositiveBigIntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-id"]

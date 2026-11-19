@@ -17,6 +17,7 @@ from .job_import import ImportError as JobImportError, import_posting
 from .models import Application, Document, Visitor
 from .notifications import queue_notifications
 from .learnings import learnings, learning_progress
+from .logs import logs
 
 
 class PortfolioAdmin(admin.AdminSite):
@@ -27,6 +28,8 @@ class PortfolioAdmin(admin.AdminSite):
 
     def get_urls(self):
         return [
+            path("logs/", self.admin_view(lambda request: logs(self, request)), name="logs"),
+            path("logs/data/", self.admin_view(lambda request: logs(self, request, data=True)), name="logs_data"),
             path("learnings/", self.admin_view(lambda request: learnings(self, request)), name="learnings"),
             path("visitor-map/", self.admin_view(self.visitor_map), name="visitor_map"),
             path("visitor-map/data/", self.admin_view(self.visitor_map_data), name="visitor_map_data"),

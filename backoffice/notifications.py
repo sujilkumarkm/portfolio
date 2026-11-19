@@ -3,6 +3,7 @@ from datetime import datetime, time, timedelta
 from django.utils import timezone
 
 from .models import Application, Notification
+from .eventlog import record_event
 
 
 QUESTIONS = (
@@ -35,6 +36,7 @@ def queue_notifications(application, previous):
     if previous is None:
         Notification.objects.create(application=application, category="new_jobs",
             subject=f"New job: {application}", body=content, due_at=now)
+        record_event(f"New-job email queued for application #{application.pk}", category="email")
     elif any(getattr(previous, field.name) != getattr(application, field.name)
              for field in Application._meta.fields if field.name not in {"id", "updated_at"}):
         Notification.objects.create(
@@ -42,11 +44,13 @@ def queue_notifications(application, previous):
             body=content,
             due_at=now,
         )
+        record_event(f"Application-update email queued for application #{application.pk}", category="email")
 
     if previous and any(getattr(previous, field) != getattr(application, field)
                         for field in ("interview_at", "interview_details", "prep_questions")):
         Notification.objects.create(application=application, category="interviews",
             subject=f"Interview update: {application}", body=content, due_at=now)
+        record_event(f"Interview-update email queued for application #{application.pk}", category="email")
 
     pending = Notification.objects.filter(application=application, sent_at=None, expires_at__isnull=False)
     if application.stage in Application.CLOSED or not interview or interview <= now:
@@ -66,3 +70,5 @@ def queue_notifications(application, previous):
         application=application, category="interviews", subject=f"Interview reminder: {application}",
         body=content, due_at=max(now, reminder), expires_at=interview,
     )
+
+    record_event(f"Interview reminder queued for application #{application.pk}", category="email")

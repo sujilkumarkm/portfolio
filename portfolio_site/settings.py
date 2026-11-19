@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'backoffice',
+    'backoffice.apps.BackofficeConfig',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'backoffice.eventlog.ActivityMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -156,3 +157,12 @@ JOB_IMPORT_OPENAI_MODEL = os.getenv("JOB_IMPORT_OPENAI_MODEL", "gpt-4.1-mini")
 
 # Local MaxMind GeoLite2 Country or City database; IPs never leave this server.
 GEOIP_DATABASE_PATH = os.getenv("GEOIP_DATABASE_PATH", str(BASE_DIR / "var" / "geoip-country.mmdb"))
+
+
+# Safe error metadata is available in the superuser-only Logs screen.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"app_events": {"class": "backoffice.eventlog.DatabaseEventHandler", "level": "ERROR"}},
+    "root": {"handlers": ["app_events"], "level": "WARNING"},
+}

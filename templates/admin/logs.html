@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block content %}
+<div class="dashboard-heading"><div><h1>Application logs</h1><p>Activity, errors and email delivery events · Europe/Dublin</p></div></div>
+<section class="logs-panel" data-url="{% url 'admin:logs_data' %}">
+  <div class="logs-toolbar"><label>Level <select id="logs-level"><option value="">All levels</option><option>INFO</option><option>WARNING</option><option>ERROR</option><option>CRITICAL</option></select></label><label>Category <select id="logs-category"><option value="">All events</option><option value="activity">Admin activity</option><option value="authentication">Sign-ins</option><option value="email">Email notifications</option><option value="learning">Learnings</option><option value="errors">Application errors</option></select></label><label>Search <input type="search" id="logs-search" placeholder="Search messages"></label><button type="button" id="logs-refresh">Refresh</button><label><input type="checkbox" id="logs-live" checked> Live refresh</label></div>
+  <div class="logs-terminal-bar"><span aria-hidden="true">● ● ●</span><span>portfolio / application events</span><span id="logs-status" role="status" aria-live="polite">Connecting…</span></div>
+  <pre id="logs-output" class="logs-output" tabindex="0" aria-label="Application log output"></pre>
+  <p class="logs-note">Latest 500 matching events, oldest first. New events refresh every 5 seconds. Logging starts with this update; existing server, PuTTY and cPanel logs are not imported. Email acceptance does not confirm inbox delivery.</p>
+</section>
+{% endblock %}
+{% block extrabody %}{{ block.super }}<script src="{% static 'app-logs.js' %}" defer></script>{% endblock %}

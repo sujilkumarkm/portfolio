@@ -9,6 +9,7 @@ from django.template.response import TemplateResponse
 from django.utils import timezone
 
 from .models import LearningEntry
+from .eventlog import record_event
 
 
 def learning_progress(user, month=None):
@@ -57,6 +58,7 @@ def learnings(admin_site, request):
                 entry.draft = []
                 entry.saved_at = timezone.now()
             entry.save()
+            record_event("Daily learning saved" if action == "save" else "Learning draft saved", category="learning", actor_id=request.user.pk)
         return JsonResponse({'message': 'Learning saved for today.' if action == 'save' else 'Draft saved', 'saved': action == 'save'})
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)

@@ -233,3 +233,24 @@ Deployment: run `python manage.py migrate --settings=portfolio_site.production`
 and collect static assets with the existing deployment process, then restart
 the app. The new migration is `backoffice.0010_learningentry`.
 Verification: `python manage.py test backoffice --noinput`.
+
+### Admin Logs
+
+Superusers can open Admin → Logs for a terminal-style event viewer with category,
+severity and search filters. It refreshes every five seconds and shows the latest
+500 matching events. Events are stored in `backoffice_appevent` starting with
+this release; old cPanel/PuTTY/server log files are not imported. Existing Django
+admin history is retained separately. Passwords, form contents, query strings,
+email addresses and raw exception messages are omitted from these events.
+Errors show exception type and code location; hosting error logs may provide
+additional debugging detail. The viewer is read-only and restricted to superusers.
+
+Includes admin requests and model create/change/delete events, authentication,
+learning drafts/saves, email queue creation, sender runs, missing subscriptions,
+backend acceptance and failed deliveries. New jobs require the New jobs subscription;
+application edits require Application updates. The scheduled `send_interview_emails`
+command is still required; queueing alone does not send email. SMTP acceptance
+is not inbox confirmation. Console/locmem acceptance is not real delivery.
+
+Deploy migration `0011_appevent`, update static assets and restart the Python app.
+Event storage is persistent; arrange database retention/backups with hosting operations.

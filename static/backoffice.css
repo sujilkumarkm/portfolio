@@ -419,3 +419,13 @@ a.dashboard-number-link:focus-visible { outline: 2px solid currentColor; outline
 .learning-viewer-footer button {padding:.65rem 1rem;border:1px solid var(--border-color);border-radius:8px;background:var(--selected-bg);color:var(--link-fg);font:inherit;cursor:pointer;}
 .learning-viewer-footer button:disabled {opacity:.45;cursor:default;}
 @media(max-width:600px) {.learning-viewer-header,.learning-viewer-footer {padding:1rem;}.learning-slide {padding:1.25rem;}.learning-slide-idea {padding:1rem;}.learning-viewer-footer button {padding:.5rem;}}
+
+.logs-panel {border:1px solid var(--border-color);border-radius:14px;overflow:hidden;background:var(--darkened-bg);}
+.logs-toolbar {display:flex;flex-wrap:wrap;align-items:center;gap:1rem;padding:1.25rem;}
+.logs-toolbar label {font-size:.9rem;display:flex;align-items:center;gap:.5rem;}
+.logs-toolbar input,.logs-toolbar select,.logs-toolbar button {font:inherit;}
+.logs-toolbar button {padding:.65rem 1rem;cursor:pointer;}
+.logs-terminal-bar {display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:#1c1c1c;color:#ddd;padding:.8rem 1.25rem;font: .875rem ui-monospace,Consolas,monospace;}
+.logs-terminal-bar > span:first-child {color:#c18a5b;letter-spacing:.2rem;}
+.logs-output {box-sizing:border-box;margin:0;padding:1.25rem;background:#050505;color:#f5f5f5;white-space:pre-wrap;overflow-wrap:anywhere;overflow:auto;height:60vh;min-height:300px;font: .95rem/1.8 ui-monospace,Consolas,"Courier New",monospace;tab-size:4;}
+.logs-note {font-size:.875rem;color:var(--body-quiet-color);padding:1rem 1.25rem;margin:0;}
