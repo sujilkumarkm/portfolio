@@ -26,6 +26,7 @@
 </section>
 {% endif %}
 <div class="dashboard-metrics">
+  {% include "admin/learning_widget.html" %}
   <div><span>Unique visitors</span><strong><a class="dashboard-number-link" href="{% url 'admin:backoffice_visitor_changelist' %}" aria-label="View unique visitors">{{ visitor_count }}</a></strong></div>
   <div><span>Active applications</span><strong><a class="dashboard-number-link" href="{{ active_url }}" aria-label="View active applications">{{ active_count }}</a></strong></div>
   <div><span>Total applications</span><strong><a class="dashboard-number-link" href="{% url 'admin:backoffice_application_changelist' %}" aria-label="View all applications">{{ application_count }}</a></strong></div>

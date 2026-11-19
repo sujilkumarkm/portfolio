@@ -215,3 +215,21 @@ employer, role, stage, work arrangement, location, and the full scheduled date
 and time in Europe/Dublin. Relative labels refresh every 30 seconds in the
 browser; reload the dashboard to fetch newly scheduled or rescheduled interviews.
 Motion follows the browser's reduced-motion preference. No migration is needed.
+
+### Private daily learnings
+
+Open Admin → Learnings. Each staff account has its own private journal, with
+1–10 heading/explanation cards per day. Leaving a field saves a database draft;
+Save today's learning finalizes the whole entry. Draft changes remain separate
+from the finalized version until saved. Today's entry can be updated; past dates
+are read-only, including unfinished drafts. Dates follow Europe/Dublin.
+
+The dashboard measures finalized learning days / elapsed calendar days this
+month (including today), with full calendar length for historical months.
+Green means 100%, yellow 75–99%, orange 40–74%, and red below 40%. Multiple
+ideas or repeated saves never count a day twice. No public route exposes notes.
+
+Deployment: run `python manage.py migrate --settings=portfolio_site.production`
+and collect static assets with the existing deployment process, then restart
+the app. The new migration is `backoffice.0010_learningentry`.
+Verification: `python manage.py test backoffice --noinput`.

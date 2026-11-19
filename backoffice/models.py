@@ -4,6 +4,19 @@ from django.db import models
 from django.conf import settings
 
 
+class LearningEntry(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    date = models.DateField()
+    draft = models.JSONField(default=list)
+    ideas = models.JSONField(default=list)
+    saved_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["user", "date"], name="one_learning_day_per_user")]
+        ordering = ["-date"]
+
+
 class Visitor(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)

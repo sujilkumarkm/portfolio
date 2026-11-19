@@ -1,0 +1,4 @@
+<section class="learning-widget" aria-label="Monthly learning consistency">
+  <div class="learning-ring" style="--learning-color: {{ learning.color }}; --learning-degrees: {{ learning.degrees }}deg" role="img" aria-label="{{ learning.percent }} percent consistency: {{ learning.completed }} of {{ learning.elapsed }} days"><b>{{ learning.percent }}%</b></div>
+  <div><h2><a href="{% url 'admin:learnings' %}">Learning consistency</a></h2><p>{{ learning.month|date:"F Y" }} · {{ learning.completed }} / {{ learning.elapsed }} days</p><p>{% if learning.percent == 100 %}<span aria-hidden="true">↗</span> Every day completed{% else %}Build your daily learning habit{% endif %}</p><small>One saved entry = one learning day. Drafts do not count.</small></div>
+</section>

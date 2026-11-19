@@ -16,6 +16,7 @@ from django.core.exceptions import PermissionDenied
 from .job_import import ImportError as JobImportError, import_posting
 from .models import Application, Document, Visitor
 from .notifications import queue_notifications
+from .learnings import learnings, learning_progress
 
 
 class PortfolioAdmin(admin.AdminSite):
@@ -26,6 +27,7 @@ class PortfolioAdmin(admin.AdminSite):
 
     def get_urls(self):
         return [
+            path("learnings/", self.admin_view(lambda request: learnings(self, request)), name="learnings"),
             path("visitor-map/", self.admin_view(self.visitor_map), name="visitor_map"),
             path("visitor-map/data/", self.admin_view(self.visitor_map_data), name="visitor_map_data"),
             *super().get_urls(),
@@ -55,6 +57,7 @@ class PortfolioAdmin(admin.AdminSite):
         upcoming = applications.filter(interview_at__gte=timezone.now()).exclude(
             stage__in=Application.CLOSED).order_by("interview_at", "pk")[:3] if can_view_interviews else []
         return super().index(request, {
+            "learning": learning_progress(request.user),
             "can_view_interviews": can_view_interviews,
             "upcoming_interviews": upcoming,
             "visitor_count": Visitor.objects.count(),

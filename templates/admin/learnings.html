@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block content %}
+<div class="dashboard-heading"><div><h1>Your learning journal</h1><p>Private notes. Small discoveries, every day.</p></div><a class="dashboard-action" href="#today-learning">Add today's learning</a></div>
+{% include "admin/learning_widget.html" %}
+<section class="learning-panel" id="today-learning">
+  <h2>Today · {{ today|date:"l, j F Y" }}</h2>
+  <p>Capture 1–10 ideas. One idea is enough to complete a day. Dates follow Europe/Dublin time.</p>
+  <form id="learning-form" data-date="{{ today|date:'Y-m-d' }}" data-url="{% url 'admin:learnings' %}">
+    {% csrf_token %}
+    <div id="learning-cards"></div>
+    <div class="learning-actions"><button type="button" id="add-idea">Add idea</button><button type="submit" class="default">Save today's learning</button><span id="learning-status" role="status" aria-live="polite">{% if has_draft %}Draft restored{% else %}Drafts save when you leave a field{% endif %}</span></div>
+  </form>
+  {{ initial_ideas|json_script:"learning-initial" }}
+</section>
+<section class="learning-panel">
+  <div class="learning-actions"><h2>Saved learnings</h2><form method="get"><label for="learning-month">Month</label> <input type="month" name="month" id="learning-month" value="{{ learning.month|date:'Y-m' }}" max="{{ today|date:'Y-m' }}"><button type="submit">View</button></form></div>
+  <p>Past entries are read-only. Expand an idea to revisit its explanation.</p>
+  {% for entry in history %}<article class="learning-day"><h3>{{ entry.date|date:"l, j F Y" }}</h3>{% for idea in entry.ideas %}<details class="learning-idea"><summary>{{ idea.heading }}</summary><div class="learning-explanation">{{ idea.explanation|linebreaksbr }}</div></details>{% endfor %}</article>{% empty %}<p>No saved learnings for this month yet.</p>{% endfor %}
+</section>
+{% endblock %}
+{% block extrabody %}{{ block.super }}<script src="{% static 'learnings.js' %}" defer></script>{% endblock %}
