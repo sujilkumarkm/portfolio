@@ -23,7 +23,7 @@ if (consent && preferences) {
     if (saved === "allow") submit("allow").catch(() => {});
     preferences.addEventListener("click", () => {
         consent.hidden = !consent.hidden;
-        if (!consent.hidden) form.querySelector("button").focus();
+        if (!consent.hidden) form.querySelector("button").focus({ preventScroll: true });
     });
     form.addEventListener("submit", async event => {
         event.preventDefault();
@@ -39,7 +39,7 @@ if (consent && preferences) {
             }
             consent.hidden = true;
             status.textContent = "";
-            preferences.focus();
+            preferences.focus({ preventScroll: true });
         } catch {
             status.textContent = "Could not save your preference. Please try again.";
         } finally {

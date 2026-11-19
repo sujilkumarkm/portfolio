@@ -23,6 +23,16 @@ SQLite database.
 
 ## Mochahost production
 
+### Offered salary on applications
+
+Add or edit an application to enter the optional **Salary offered**, including
+currency, range and pay period. It appears first under **Job details** on the
+application detail page. Job posting and company website links open in a new tab.
+Apply migration `0012_application_salary_offered` with `python manage.py migrate`
+locally before testing. After local approval, use the existing production
+deployment process and run `python manage.py migrate --settings=portfolio_site.production`
+before restarting the app.
+
 Production defaults to the cPanel MySQL user `suji1991_portfolio`, which
 already has grants on `suji1991_sujil_portfolio`. Set the Python application's startup file to
 `passenger_wsgi.py` and its entry point to `application`. The existing

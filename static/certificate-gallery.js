@@ -10,6 +10,7 @@ if (certificateGallery && typeof certificateGallery.showModal === "function") {
 
             event.preventDefault();
             certificateGallery.showModal();
+            certificateGallery.querySelector(".certificate-close").focus({ preventScroll: true });
         });
     });
 

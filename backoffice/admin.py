@@ -137,7 +137,7 @@ class ApplicationAdmin(admin.ModelAdmin):
     ordering = ("-updated_at",)
     readonly_fields = ("saved_documents",)
     fieldsets = (
-        ("Application", {"fields": ("role", "company", "stage", "posting_url", "posting_details", "notes")}),
+        ("Application", {"fields": ("role", "company", "salary_offered", "stage", "posting_url", "posting_details", "notes")}),
         ("Location and work arrangement", {
             "fields": ("job_location", "work_arrangement", "office_days_per_week"),
         }),

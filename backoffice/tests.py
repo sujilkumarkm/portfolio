@@ -10,6 +10,39 @@ from .models import Application, MemberPreferences, Notification
 from .notifications import queue_notifications
 
 
+class ApplicationSalaryTests(TestCase):
+    def test_salary_add_edit_and_detail_external_links(self):
+        owner = get_user_model().objects.create_superuser("salary-owner")
+        self.client.force_login(owner)
+        fields = {
+            "role": "Support Analyst", "company": "Example",
+            "stage": Application.Stage.APPLIED,
+            "posting_url": "https://example.com/jobs/1",
+            "company_website": "https://example.com/",
+        }
+        add_url = reverse("admin:backoffice_application_add")
+        self.assertContains(self.client.get(add_url), 'name="salary_offered"')
+        salary = "€55,000–€60,000 per year"
+        response = self.client.post(add_url, {**fields, "salary_offered": salary, "_save": "Save"})
+        self.assertEqual(response.status_code, 302)
+        application = Application.objects.get()
+        self.assertEqual(application.salary_offered, salary)
+        detail_url = reverse("admin:application_detail", args=[application.pk])
+        detail = self.client.get(detail_url)
+        self.assertContains(detail, salary)
+        for url, label in ((fields["posting_url"], "Open posting"), (fields["company_website"], "Open website")):
+            self.assertContains(detail, f'<a href="{url}" target="_blank" rel="noopener noreferrer">{label}</a>', html=True)
+        change_url = reverse("admin:backoffice_application_change", args=[application.pk])
+        self.assertContains(self.client.get(change_url), 'name="salary_offered"')
+        self.assertContains(detail, '<span aria-hidden="true">€</span> Salary offered', html=True)
+        for value in ("€35 per hour", ""):
+            response = self.client.post(change_url, {**fields, "salary_offered": value, "_save": "Save"})
+            self.assertEqual(response.status_code, 302)
+            application.refresh_from_db()
+            self.assertEqual(application.salary_offered, value)
+        self.assertContains(self.client.get(detail_url), '<dd>—</dd>', html=True)
+
+
 class ApplicationNotesTests(TestCase):
     def test_long_unicode_notes_are_saved_in_full_on_add_and_edit(self):
         owner = get_user_model().objects.create_superuser("notes-owner")

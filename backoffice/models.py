@@ -48,6 +48,10 @@ class Application(models.Model):
     CLOSED = (Stage.ACCEPTED, Stage.REJECTED, Stage.WITHDRAWN)
     role = models.CharField(max_length=200)
     company = models.CharField(max_length=200)
+    salary_offered = models.CharField(
+        "salary offered", max_length=200, blank=True,
+        help_text="Salary offered by the employer or recruiter, including currency and period (e.g. €55,000–€60,000 per year).",
+    )
     company_website = models.URLField(blank=True, validators=[URLValidator(schemes=["http", "https"])])
     company_details = models.TextField(blank=True)
     posting_url = models.URLField(max_length=2048, blank=True, validators=[URLValidator(schemes=["http", "https"])])

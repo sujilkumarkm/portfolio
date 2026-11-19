@@ -11,6 +11,7 @@
 
 {% block content %}
 <div class="application-detail">
+  <dl class="application-salary"><dt><span aria-hidden="true">€</span> Salary offered</dt><dd>{{ application.salary_offered|default:"—" }}</dd></dl>
   {% if can_edit %}<a class="dashboard-action" href="{% url 'admin:backoffice_application_change' application.pk %}">Edit application</a>{% endif %}
   {% include "admin/application_progress.html" %}
   <div class="application-detail-grid">
@@ -20,8 +21,8 @@
         <dt>Job / office location</dt><dd>{{ application.job_location|default:"—" }}</dd>
         <dt>Work arrangement</dt><dd>{{ application.get_work_arrangement_display|default:"—" }}</dd>
         <dt>Office days per week</dt><dd>{{ application.office_days_per_week|default_if_none:"—" }}</dd>
-        {% if application.posting_url %}<dt>Job posting</dt><dd><a href="{{ application.posting_url }}">Open posting</a></dd>{% endif %}
-        {% if application.company_website %}<dt>Company website</dt><dd><a href="{{ application.company_website }}">Open website</a></dd>{% endif %}
+        {% if application.posting_url %}<dt>Job posting</dt><dd><a href="{{ application.posting_url }}" target="_blank" rel="noopener noreferrer">Open posting</a></dd>{% endif %}
+        {% if application.company_website %}<dt>Company website</dt><dd><a href="{{ application.company_website }}" target="_blank" rel="noopener noreferrer">Open website</a></dd>{% endif %}
         <dt>Last updated</dt><dd>{{ application.updated_at }}</dd>
       </dl>
     </section>

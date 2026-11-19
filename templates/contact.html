@@ -25,9 +25,9 @@
                 <a href="{% url 'home' %}#about">About</a>
                 <a class="button nav-contact" href="{% url 'contact' %}" aria-current="page">Contact <span aria-hidden="true">&nearr;</span></a>
             </div>
-            {% include "theme_toggle.html" %}
         </nav>
     </header>
+    {% include "page_theme_control.html" %}
 
     <main id="main" class="contact-page shell" tabindex="-1">
         <h1>Contact <span class="outline-text">me.</span></h1>
