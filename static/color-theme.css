@@ -1,0 +1,32 @@
+.color-theme-toggle:not([hidden]) {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 2.65rem;
+    height: 2.65rem;
+    padding: 0;
+    border: 1px solid var(--theme-control-border);
+    border-radius: 50%;
+    color: var(--theme-control-fg);
+    background: var(--theme-control-bg);
+    font: 1.25rem/1 system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.color-theme-toggle:hover {
+    border-color: currentColor;
+}
+
+.color-theme-toggle:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+}
+
+.theme-moon,
+html[data-theme="light"] .theme-sun {
+    display: none;
+}
+
+html[data-theme="light"] .theme-moon {
+    display: inline;
+}

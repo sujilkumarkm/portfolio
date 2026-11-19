@@ -23,7 +23,7 @@
       const max = Math.max(1, ...data.countries.map(r => r.visitors));
       for (const [code, item] of countries) {
         const count = counts.get(code)?.visitors || 0;
-        item.path.style.fill = count ? `hsl(27 95% ${65 - 22 * Math.log1p(count)/Math.log1p(max)}%)` : '#353d40';
+        item.path.style.fill = count ? `hsl(27 95% ${65 - 22 * Math.log1p(count)/Math.log1p(max)}%)` : 'var(--map-empty)';
         const label = `${item.name}: ${count} unique visitors`;
         item.path.setAttribute('aria-label', label); item.title.textContent = label;
       }

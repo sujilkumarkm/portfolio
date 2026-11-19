@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% include "metadata.html" %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&amp;display=swap">
+    {% include "theme_head.html" with scope="public" only %}
     <link rel="stylesheet" href="{% static 'portfolio.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.17.0/devicon.min.css">
     <script src="{% static 'portfolio-motion.js' %}" defer></script>

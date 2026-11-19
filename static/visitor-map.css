@@ -1,13 +1,13 @@
-#visitor-map { border: 1px solid #493325; border-radius: 16px; background: #15110f; overflow: hidden; margin-bottom: 20px; }
-.map-summary { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; padding: 20px; border-bottom: 1px solid #392820; }
-#map-total { font-size: 1.3rem; font-weight: 700; color: #ffc595; }
+#visitor-map { border: 1px solid var(--border-color); border-radius: 16px; background: var(--darkened-bg); overflow: hidden; margin-bottom: 20px; }
+.map-summary { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; padding: 20px; border-bottom: 1px solid var(--hairline-color); }
+#map-total { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
 #map-status { margin-left: auto; font-size: .85rem; }
-.map-canvas { background: radial-gradient(ellipse at center, #262523, #111719); padding: 12px; }
+.map-canvas { background: radial-gradient(ellipse at center, var(--map-water-glow), var(--map-water)); padding: 12px; }
 #world-map { display: block; width: 100%; max-height: 65vh; }
-#world-map path { stroke: #151719; stroke-width: .6; transition: fill .2s; cursor: pointer; }
-#world-map path:hover, #world-map path:focus { fill: #ffe1b8 !important; stroke: #fff; stroke-width: 1.5; outline: none; }
-#map-selection { padding: 16px 20px; font-size: 1.1rem; min-height: 1.5em; color: #ffd0a6; }
-.map-legend { padding: 0 20px 16px; color: #bfb0a5; }
-.map-legend span { display: inline-block; width: 12px; height: 12px; background: #353d40; margin: 0 6px; border-radius: 3px; }
+#world-map path { stroke: var(--map-country-border); stroke-width: .6; transition: fill .2s; cursor: pointer; }
+#world-map path:hover, #world-map path:focus { fill: var(--map-active) !important; stroke: var(--body-loud-color); stroke-width: 1.5; outline: none; }
+#map-selection { padding: 16px 20px; font-size: 1.1rem; min-height: 1.5em; color: var(--accent); }
+.map-legend { padding: 0 20px 16px; color: var(--body-quiet-color); }
+.map-legend span { display: inline-block; width: 12px; height: 12px; background: var(--map-empty); margin: 0 6px; border-radius: 3px; }
 .map-legend span:nth-of-type(2) { background: #ff9a4d; }
 #map-country-table { width: 100%; } #map-country-table caption { text-align: left; font-weight: bold; padding: 12px 0; }
