@@ -44,7 +44,7 @@ class LearningTests(TestCase):
             self.assertEqual(self.post('save', ideas).status_code, 400)
         self.assertFalse(LearningEntry.objects.exists())
         self.assertEqual(self.post('save', [{'heading': 'Idea', 'explanation': 'Details'}] * 10).status_code, 200)
-        self.assertEqual(self.post('save').status_code, 200)
+        self.assertEqual(self.post('save').status_code, 400)
         self.assertEqual(LearningEntry.objects.count(), 1)
 
     def test_private_per_user_and_requires_admin(self):
@@ -68,3 +68,23 @@ class LearningTests(TestCase):
         self.assertEqual(learning_progress(self.user)['percent'], 50)
         self.assertEqual(learning_progress(self.user)['color'], '#ea580c')
         self.assertEqual(learning_progress(self.user, date(2024, 2, 1))['elapsed'], 29)
+
+    def test_saved_ideas_clear_form_and_new_ideas_append(self):
+        self.post('save')
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['initial_ideas'], [{'heading': '', 'explanation': ''}])
+        self.assertFalse(response.context['has_draft'])
+        self.assertLess(response.content.index(b'Saved learnings'), response.content.index(b'id="today-learning"'))
+        self.post('save', [{'heading': 'Second idea', 'explanation': 'More details'}])
+        entry = LearningEntry.objects.get()
+        self.assertEqual([idea['heading'] for idea in entry.ideas], ['Transactions', 'Second idea'])
+        self.assertEqual(entry.draft, [])
+        self.assertEqual(learning_progress(self.user)['completed'], 1)
+
+    def test_legacy_saved_content_is_not_restored_as_draft(self):
+        self.post('save')
+        entry = LearningEntry.objects.get()
+        entry.draft = entry.ideas
+        entry.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['initial_ideas'], [{'heading': '', 'explanation': ''}])

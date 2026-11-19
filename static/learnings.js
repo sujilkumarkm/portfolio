@@ -2,6 +2,7 @@
   const form = document.getElementById('learning-form');
   if (!form) return;
   const cards = document.getElementById('learning-cards');
+  const limit = Number(form.dataset.limit);
   const status = document.getElementById('learning-status');
   const add = document.getElementById('add-idea');
   const submit = form.querySelector('[type=submit]');
@@ -52,12 +53,12 @@
     cards.append(card); update();
   }
   function update() {
-    add.disabled = cards.children.length >= 10;
+    add.disabled = cards.children.length >= limit;
     [...cards.children].forEach(card => { card.querySelector('button').disabled = cards.children.length === 1; });
   }
   JSON.parse(document.getElementById('learning-initial').textContent).forEach(renderCard);
   add.addEventListener('click', () => {
-    if (cards.children.length >= 10) return;
+    if (cards.children.length >= limit) return;
     renderCard({heading: '', explanation: ''}); revision++; dirty = true;
     persist('draft'); cards.lastElementChild.querySelector('input').focus();
   });

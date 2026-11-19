@@ -49,9 +49,12 @@ def learnings(admin_site, request):
         with transaction.atomic():
             entry, _ = LearningEntry.objects.get_or_create(user=request.user, date=today)
             entry = LearningEntry.objects.select_for_update().get(pk=entry.pk)
+            if len(entry.ideas) + len(cleaned) > 10:
+                return JsonResponse({'error': 'You can save up to 10 ideas per day, including ideas already saved.'}, status=400)
             entry.draft = cleaned
             if action == 'save':
-                entry.ideas = cleaned
+                entry.ideas = entry.ideas + cleaned
+                entry.draft = []
                 entry.saved_at = timezone.now()
             entry.save()
         return JsonResponse({'message': 'Learning saved for today.' if action == 'save' else 'Draft saved', 'saved': action == 'save'})
@@ -68,7 +71,8 @@ def learnings(admin_site, request):
     request.current_app = admin_site.name
     return TemplateResponse(request, 'admin/learnings.html', {
         **admin_site.each_context(request), 'title': 'Learnings', 'today': today,
-        'initial_ideas': (entry.draft or entry.ideas) if entry else [{'heading': '', 'explanation': ''}],
-        'has_draft': bool(entry and entry.draft != entry.ideas),
+        'initial_ideas': entry.draft if entry and entry.draft and entry.draft != entry.ideas else [{'heading': '', 'explanation': ''}],
+        'remaining_ideas': 10 - len(entry.ideas) if entry else 10,
+        'has_draft': bool(entry and entry.draft and entry.draft != entry.ideas),
         'learning': learning_progress(request.user, month), 'history': history,
     })
