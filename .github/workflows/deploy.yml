@@ -1,0 +1,68 @@
+name: Check and deploy portfolio
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev pkg-config
+      - run: python -m pip install -r requirements.txt
+      - run: python manage.py check
+      - run: python manage.py test backoffice --noinput
+      - run: bash -n scripts/deploy.sh
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && vars.CPANEL_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: portfolio-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy checked commit over SSH
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.CPANEL_SSH_HOST }}
+          DEPLOY_PORT: ${{ secrets.CPANEL_SSH_PORT }}
+          DEPLOY_USER: ${{ secrets.CPANEL_SSH_USER }}
+          DEPLOY_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.CPANEL_SSH_KNOWN_HOSTS }}
+          APP_DIR: ${{ secrets.CPANEL_APP_DIR }}
+          PYTHON_BIN: ${{ secrets.CPANEL_PYTHON_BIN }}
+          ENV_FILE: ${{ secrets.CPANEL_ENV_FILE }}
+        run: |
+          set -euo pipefail
+          : "${DEPLOY_HOST:?Missing SSH host}" "${DEPLOY_USER:?Missing SSH user}"
+          : "${DEPLOY_KEY:?Missing SSH key}" "${KNOWN_HOSTS:?Missing verified host key}"
+          : "${APP_DIR:?Missing application directory}" "${PYTHON_BIN:?Missing Python path}"
+          : "${ENV_FILE:?Missing server environment file}"
+          install -m 700 -d ~/.ssh
+          umask 077
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
+          printf -v remote_command 'bash -s -- %q %q %q %q' "$APP_DIR" "$PYTHON_BIN" "$ENV_FILE" "$GITHUB_SHA"
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+            -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" \
+            "$DEPLOY_USER@$DEPLOY_HOST" "$remote_command" < scripts/deploy.sh
+      - name: Verify public pages
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors https://sujil.net/software/ -o /tmp/software.html
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors https://sujil.net/support/ -o /tmp/support.html
+          grep -q '<h3>Java</h3>' /tmp/software.html
+          grep -q '<h3>Splunk and log analysis</h3>' /tmp/support.html

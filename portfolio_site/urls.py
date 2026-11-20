@@ -26,7 +26,7 @@ def software(request):
         page_metadata(
             "software",
             "Software & Web Developer | Sujil Mani, Ireland",
-            "Explore Sujil Mani’s software and web development skills in Dundalk, Ireland: Python, Django, Laravel, Vue.js, SQL and data analytics.",
+            "Explore Sujil Mani’s software and web development skills in Dundalk, Ireland: Java, JSP, Python, Django, Laravel, Vue.js, SQL and data analytics.",
         ),
     )
 
@@ -50,7 +50,7 @@ def support(request):
         page_metadata(
             "support",
             "Application & IT Support Engineer | Sujil Mani, Dundalk",
-            "Sujil Mani, support engineer in Dundalk, Ireland, with Kaseya experience in application support, IT troubleshooting, endpoint management and access management.",
+            "Sujil Mani, support engineer in Dundalk, Ireland, with Kaseya experience in Java/J2EE troubleshooting, stack-trace analysis, Splunk, SQL, incident investigation and endpoint support.",
         ),
     )
 
