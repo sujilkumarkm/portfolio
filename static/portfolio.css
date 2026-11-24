@@ -13,6 +13,8 @@
     --button-hover: #ffad71;
     --outline-fill: #231710;
     --outline-stroke: #d99b72;
+    --hero-base: #100c0a;
+    --hero-glow: rgb(145 61 26 / 20%);
 }
 
 :root {
@@ -24,7 +26,6 @@
     --theme-control-fg: var(--accent-light);
     --theme-control-border: var(--line);
     --header-bg: rgb(11 9 8 / 92%);
-    --intro-glow: #432417;
     --icon-border: #5b3825;
     --icon-bg: #2c1c14;
     --project-glow: #ca642b;
@@ -56,7 +57,8 @@ html[data-theme="light"] {
     --line: #e1c8b5;
     --action-fg: #fff8ef;
     --header-bg: rgb(255 249 242 / 94%);
-    --intro-glow: #f9dac1;
+    --hero-base: #fff3e8;
+    --hero-glow: rgb(210 113 60 / 20%);
     --icon-border: #d9a986;
     --icon-bg: #fae8d9;
     --button-hover: #743615;
@@ -207,13 +209,12 @@ section[id] { scroll-margin-top: 5.5rem; }
 .nav-links > a[aria-current="page"]:not(.button) { color: var(--accent-light); }
 
 .software-page {
-    padding-block: clamp(3rem, 7vw, 6rem) 5rem;
+    padding-bottom: 5rem;
 }
 
 .software-intro {
-    padding-bottom: clamp(2rem, 5vw, 4rem);
+    padding-block: clamp(3rem, 7vw, 6rem) clamp(2rem, 5vw, 4rem);
     border-bottom: 1px solid var(--line);
-    background: radial-gradient(ellipse at 75% 0%, var(--intro-glow) 0%, transparent 68%);
 }
 
 .software-intro h1 {
@@ -363,17 +364,20 @@ section[id] { scroll-margin-top: 5.5rem; }
 }
 
 .hero {
+    border-bottom: 1px solid var(--line);
+}
+
+.hero-backdrop {
     position: relative;
     isolation: isolate;
     overflow: hidden;
     color: var(--text);
-    border-bottom: 1px solid var(--line);
     background:
-        radial-gradient(ellipse at 75% 42%, rgb(145 61 26 / 20%), transparent 49%),
-        linear-gradient(125deg, #100c0a, var(--bg) 62%);
+        radial-gradient(ellipse at 75% 42%, var(--hero-glow), transparent 49%),
+        linear-gradient(125deg, var(--hero-base), var(--bg) 62%);
 }
 
-.hero::before {
+.hero-backdrop::before {
     position: absolute;
     inset: 0;
     z-index: -1;
@@ -815,6 +819,15 @@ section[id] { scroll-margin-top: 5.5rem; }
 
 .project-chat {
     scroll-margin-top: 5.5rem;
+}
+
+.project-chat-illustration {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: clamp(1.15rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    border-radius: .75rem;
 }
 
 .chat-art {

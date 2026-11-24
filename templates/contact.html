@@ -31,24 +31,26 @@
         {% include "page_theme_control.html" %}
     </header>
 
-    <main id="main" class="contact-page shell" tabindex="-1">
-        <h1>Contact <span class="outline-text">me.</span></h1>
-        <div class="contact-grid">
-            <section class="profile-card" aria-labelledby="address-title" data-card-glow>
-                <h2 id="address-title">Address</h2>
-                <address>{{ street_address }}<br>{{ locality }}<br>{{ region }}</address>
-                {% if phone %}
-                    <p class="contact-phone"><a class="button call-button" href="tel:{{ phone }}">Call me <span>{{ phone }}</span></a></p>
-                {% endif %}
+    <main id="main" class="contact-page hero-backdrop" tabindex="-1">
+        <div class="shell">
+            <h1>Contact <span class="outline-text">me.</span></h1>
+            <div class="contact-grid">
+                <section class="profile-card" aria-labelledby="address-title" data-card-glow>
+                    <h2 id="address-title">Address</h2>
+                    <address>{{ street_address }}<br>{{ locality }}<br>{{ region }}</address>
+                    {% if phone %}
+                        <p class="contact-phone"><a class="button call-button" href="tel:{{ phone }}">Call me <span>{{ phone }}</span></a></p>
+                    {% endif %}
+                    {% with query=street_address|add:", "|add:locality|add:", "|add:region %}
+                        <a href="https://www.google.com/maps/search/?api=1&amp;query={{ query|urlencode }}" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+                    {% endwith %}
+                </section>
                 {% with query=street_address|add:", "|add:locality|add:", "|add:region %}
-                    <a href="https://www.google.com/maps/search/?api=1&amp;query={{ query|urlencode }}">Open in Google Maps</a>
+                    <iframe class="contact-map" title="Google Maps showing the contact address in Dundalk"
+                        src="https://maps.google.com/maps?q={{ query|urlencode }}&amp;output=embed"
+                        width="800" height="450" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
                 {% endwith %}
-            </section>
-            {% with query=street_address|add:", "|add:locality|add:", "|add:region %}
-                <iframe class="contact-map" title="Google Maps showing the contact address in Dundalk"
-                    src="https://maps.google.com/maps?q={{ query|urlencode }}&amp;output=embed"
-                    width="800" height="450" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            {% endwith %}
+            </div>
         </div>
     </main>
 
