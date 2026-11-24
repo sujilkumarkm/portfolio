@@ -1,0 +1,45 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'portfolio-chat.css' %}">
+<script src="{% static 'portfolio-chat.js' %}" defer></script>
+<div class="portfolio-chat">
+  <section
+    class="portfolio-chat__panel"
+    id="portfolio-chat-panel"
+    aria-labelledby="portfolio-chat-title"
+    hidden
+  >
+    <div class="portfolio-chat__header">
+      <h2 id="portfolio-chat-title">Digital Twin</h2>
+      <button class="portfolio-chat__close" type="button" aria-label="Close chat">&times;</button>
+    </div>
+    <iframe
+      class="portfolio-chat__frame"
+      data-src="https://sujilmani-twin.hf.space/"
+      title="Chat with Sujil Mani’s Digital Twin"
+    ></iframe>
+  </section>
+
+  <button
+    class="portfolio-chat__button"
+    id="portfolio-chat-button"
+    type="button"
+    aria-label="Open chat"
+    aria-controls="portfolio-chat-panel"
+    aria-expanded="false"
+  >
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 5.75A2.75 2.75 0 0 1 6.75 3h10.5A2.75 2.75 0 0 1 20 5.75v7.5A2.75 2.75 0 0 1 17.25 16H10l-5 4v-4.5A2.75 2.75 0 0 1 4 13.25v-7.5Z"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8 8h8M8 11.5h5"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+</div>
