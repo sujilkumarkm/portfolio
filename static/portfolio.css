@@ -158,19 +158,22 @@ section[id] { scroll-margin-top: 5.5rem; }
 }
 
 .page-theme-control {
-    position: relative;
-    z-index: 3;
-    height: 0;
-}
-
-.page-theme-control .color-theme-toggle {
     position: absolute;
-    top: .65rem;
-    right: 0;
+    inset-block-start: 50%;
+    inset-inline-end: clamp(1rem, 2vw, 2rem);
+    transform: translateY(-50%);
 }
 
+.page-theme-control:empty,
 .page-theme-control:has(.color-theme-toggle[hidden]) {
     display: none;
+}
+
+@media (width > 54rem) {
+    .site-header .nav {
+        width: min(calc(100% - var(--gutter) - 5.5rem), 74rem);
+        margin-inline-end: max(calc((100% - 74rem) / 2), 5.5rem);
+    }
 }
 
 .brand {
@@ -187,7 +190,9 @@ section[id] { scroll-margin-top: 5.5rem; }
 .brand span { color: var(--accent); font: 700 .85rem/1 var(--mono); }
 .nav-links { display: flex; align-items: center; gap: clamp(.85rem, 2vw, 1.9rem); }
 
-.nav-links > a:not(.button) {
+.nav-about-row { display: contents; }
+
+:is(.nav-links, .nav-about-row) > a:not(.button) {
     padding-block: .4rem;
     color: var(--muted);
     font-size: .86rem;
@@ -196,7 +201,7 @@ section[id] { scroll-margin-top: 5.5rem; }
     transition: color .2s ease;
 }
 
-.nav-links > a:not(.button):hover, .nav-links > a:not(.button):focus-visible { color: var(--accent-light); }
+:is(.nav-links, .nav-about-row) > a:not(.button):is(:hover, :focus-visible) { color: var(--accent-light); }
 .menu-toggle { display: none; }
 
 .nav-links > a[aria-current="page"]:not(.button) { color: var(--accent-light); }
@@ -610,7 +615,14 @@ section[id] { scroll-margin-top: 5.5rem; }
     }
 
     .menu-ready.menu-open .nav-links { display: flex; }
-    .menu-ready .nav-links > a:not(.button) { padding: .55rem .65rem; }
+    .menu-ready :is(.nav-links, .nav-about-row) > a:not(.button) { padding: .55rem .65rem; }
+    .menu-ready .nav-about-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-inline-end: 1.15rem;
+    }
+    .menu-ready .nav-about-row a { flex: 1; }
     .menu-ready .nav-contact { margin-top: .15rem; }
     .nav .menu-toggle { margin-inline-start: auto; }
 }

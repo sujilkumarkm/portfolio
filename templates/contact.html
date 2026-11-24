@@ -22,12 +22,14 @@
                 <a href="{% url 'home' %}#skills">Skills</a>
                 <a href="{% url 'home' %}#work">Projects</a>
                 <a href="{% url 'home' %}#experience">Experience</a>
-                <a href="{% url 'home' %}#about">About</a>
+                <div class="nav-about-row">
+                    <a href="{% url 'home' %}#about">About</a>
+                </div>
                 <a class="button nav-contact" href="{% url 'contact' %}" aria-current="page">Contact <span aria-hidden="true">&nearr;</span></a>
             </div>
         </nav>
+        {% include "page_theme_control.html" %}
     </header>
-    {% include "page_theme_control.html" %}
 
     <main id="main" class="contact-page shell" tabindex="-1">
         <h1>Contact <span class="outline-text">me.</span></h1>

@@ -18,6 +18,18 @@
         nav.classList.add("menu-ready");
         setOpen(false);
 
+        const themeControl = document.querySelector(".page-theme-control");
+        const themeButton = themeControl?.querySelector("[data-color-theme-toggle]");
+        const aboutRow = links.querySelector(".nav-about-row");
+        if (themeButton && aboutRow) {
+            const mobileMenu = window.matchMedia("(max-width: 54rem)");
+            function placeThemeButton() {
+                (mobileMenu.matches ? aboutRow : themeControl).append(themeButton);
+            }
+            placeThemeButton();
+            mobileMenu.addEventListener("change", placeThemeButton);
+        }
+
         toggle.addEventListener("click", () => setOpen(!nav.classList.contains("menu-open")));
         links.addEventListener("click", (event) => {
             if (event.target.closest("a")) {
