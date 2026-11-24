@@ -104,6 +104,21 @@ class Document(models.Model):
         constraints = [models.UniqueConstraint(fields=["application", "kind"], name="one_document_per_kind")]
 
 
+class InterviewQuestion(models.Model):
+    employer = models.CharField(max_length=200)
+    interview_date = models.DateField()
+    filename = models.CharField(max_length=200)
+    content = models.BinaryField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-interview_date", "employer"]
+        verbose_name_plural = "Interview questions"
+
+    def __str__(self):
+        return f"{self.employer} · {self.interview_date}"
+
+
 class Notification(models.Model):
     category = models.CharField(max_length=25, default="application_updates")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)

@@ -48,6 +48,30 @@ and the hosting error log; resolve the cause and rerun. Database rollback must
 be planned separately. Confirm that `tmp/restart.txt` restarts your Passenger
 application; otherwise use cPanel's Restart button.
 
+## Interview question documents
+
+The interview-question library adds the `backoffice_interviewquestion` table.
+Back up the production database before deploying. Pushing the change to `master`
+uses the workflow above to install requirements, run Django checks, apply
+migrations, and request a Passenger restart.
+
+For a manual rollout, push the commit to GitHub and, in cPanel Terminal, run
+these commands from the production checkout with the production Python
+environment active and the required environment variables available:
+
+```sh
+git pull --ff-only origin master
+python manage.py check --settings=portfolio_site.production
+python manage.py migrate --noinput --settings=portfolio_site.production
+mkdir -p tmp
+touch tmp/restart.txt
+```
+
+If `tmp/restart.txt` does not restart the app on this host, restart it through
+cPanel's Python application controls. Afterward, open Admin → Interview
+questions and verify that the list is accessible. Uploaded attachments are
+stored in the database, so no public media-directory configuration is needed.
+
 ## Deploy this content update manually
 
 In your usual cPanel Terminal, change to the existing production checkout and run:

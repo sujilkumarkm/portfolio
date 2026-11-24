@@ -25,6 +25,35 @@
   </ol>
 </section>
 {% endif %}
+{% if can_manage_interview_questions %}
+<section class="interview-question-library" aria-labelledby="questions-title">
+  <div class="upcoming-heading">
+    <div><h2 id="questions-title">Interview questions</h2><span>Private notes and documents by employer</span></div>
+    <div class="interview-question-actions">
+      {% if can_view_interview_questions %}<a class="dashboard-action" href="{% url 'admin:backoffice_interviewquestion_changelist' %}">View all</a>{% endif %}
+      {% if perms.backoffice.add_interviewquestion %}<a class="dashboard-action" href="{% url 'admin:backoffice_interviewquestion_add' %}">Add questions</a>{% endif %}
+    </div>
+  </div>
+  {% if can_view_interview_questions %}
+  <ul class="interview-question-list">
+    {% for question in interview_questions %}
+    <li><div><strong>{{ question.employer }}</strong><time datetime="{{ question.interview_date|date:'Y-m-d' }}">{{ question.interview_date|date:"j F Y" }}</time></div>
+      <div class="interview-question-row-actions">
+        <button type="button" class="interview-question-preview-button"
+          data-interview-question-preview="{% url 'admin:interview_question_preview' question.pk %}"
+          data-document-title="{{ question.filename }}" data-document-filename="{{ question.filename }}"
+          data-document-download="{% url 'admin:interview_question_document' question.pk %}"
+          aria-label="Preview {{ question.filename }}" title="Preview document" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <a href="{% url 'admin:interview_question_document' question.pk %}">{{ question.filename }} <span aria-hidden="true">↓</span></a>
+      </div>
+    </li>
+    {% empty %}<li class="interview-question-empty">No interview question documents yet.</li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endif %}
 <div class="dashboard-metrics">
   {% include "admin/learning_widget.html" %}
   <div><span>Unique visitors</span><strong><a class="dashboard-number-link" href="{% url 'admin:backoffice_visitor_changelist' %}" aria-label="View unique visitors">{{ visitor_count }}</a></strong></div>
@@ -51,6 +80,8 @@
 {% block extrabody %}
 {{ block.super }}
 <script src="{% static 'upcoming-interviews.js' %}" defer></script>
+{% include "admin/interview_question_preview.html" %}
+<script src="{% static 'interview-question-preview.js' %}" defer></script>
 <script>
   if (typeof Intl.DisplayNames === "function") {
     const names = new Intl.DisplayNames([document.documentElement.lang || "en"], {type: "region"});

@@ -226,6 +226,32 @@ and time in Europe/Dublin. Relative labels refresh every 30 seconds in the
 browser; reload the dashboard to fetch newly scheduled or rescheduled interviews.
 Motion follows the browser's reduced-motion preference. No migration is needed.
 
+### Interview question documents
+
+Open Admin → Interview questions, or use the dashboard panel to add or view
+entries. Each entry stores the employer, interview date, and one private PDF or
+DOCX attachment (up to 5 MB). Documents are stored in the database, not in the
+public media directory, and downloads require an authenticated admin account
+with permission to view or change interview questions. Uploading a new file
+while editing replaces the existing attachment. Use the eye icon in the
+dashboard or list to preview PDFs and DOCX files in a read-only modal; DOCX
+previews are rendered locally and do not send private documents to an external
+viewer.
+
+Apply the new migration locally with `python manage.py migrate`. To deploy
+manually, first push and pull the code on the production server, activate the
+production Python environment, and run:
+
+```sh
+python manage.py check --settings=portfolio_site.production
+python manage.py migrate --noinput --settings=portfolio_site.production
+```
+
+Back up the production database before applying migrations. The configured
+GitHub Actions deployment also runs migrations automatically after a successful
+deployment. Restart the Python app after a manual deployment, then check Admin
+→ Interview questions.
+
 ### Private daily learnings
 
 Open Admin → Learnings. Each staff account has its own private journal, with

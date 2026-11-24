@@ -1,13 +1,162 @@
-from io import StringIO
+from io import BytesIO, StringIO
+import zipfile
 from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command, CommandError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
-from .models import Application, MemberPreferences, Notification
+from .models import Application, InterviewQuestion, MemberPreferences, Notification
 from .notifications import queue_notifications
+
+
+class InterviewQuestionTests(TestCase):
+    def setUp(self):
+        self.owner = get_user_model().objects.create_superuser("question-owner", "owner@example.com", "password")
+        self.client.force_login(self.owner)
+        self.add_url = reverse("admin:backoffice_interviewquestion_add")
+
+    @staticmethod
+    def pdf(name="questions.pdf", content=b"%PDF-1.7\nquestions"):
+        return SimpleUploadedFile(name, content, content_type="application/pdf")
+
+    def test_create_edit_and_download_private_document(self):
+        response = self.client.post(self.add_url, {
+            "employer": "Example Employer",
+            "interview_date": "2026-11-24",
+            "document": self.pdf(),
+            "_save": "Save",
+        })
+        self.assertEqual(response.status_code, 302)
+        question = InterviewQuestion.objects.get()
+        self.assertEqual(question.filename, "questions.pdf")
+        self.assertEqual(question.content, b"%PDF-1.7\nquestions")
+        dashboard = self.client.get(reverse("admin:index"))
+        self.assertContains(dashboard, "Example Employer")
+        self.assertContains(dashboard, "data-interview-question-preview")
+        self.assertContains(
+            self.client.get(reverse("admin:backoffice_interviewquestion_changelist")),
+            "data-interview-question-preview",
+        )
+
+        download = self.client.get(reverse("admin:interview_question_document", args=[question.pk]))
+        self.assertEqual(download.status_code, 200)
+        self.assertEqual(download.content, question.content)
+        self.assertIn("attachment", download["Content-Disposition"])
+        preview = self.client.get(reverse("admin:interview_question_preview", args=[question.pk]))
+        self.assertEqual(preview["Content-Type"], "application/pdf")
+        self.assertEqual(preview.content, question.content)
+        self.assertIn("inline", preview["Content-Disposition"])
+
+        change_url = reverse("admin:backoffice_interviewquestion_change", args=[question.pk])
+        response = self.client.post(change_url, {
+            "employer": "Updated Employer",
+            "interview_date": "2026-11-25",
+            "_save": "Save",
+        })
+        self.assertEqual(response.status_code, 302)
+        question.refresh_from_db()
+        self.assertEqual(question.employer, "Updated Employer")
+        self.assertEqual(question.content, b"%PDF-1.7\nquestions")
+
+    def test_reject_invalid_document_and_require_document_on_add(self):
+        fields = {"employer": "Example", "interview_date": "2026-11-24", "_save": "Save"}
+        response = self.client.post(self.add_url, fields)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "This field is required")
+        response = self.client.post(self.add_url, {
+            **fields,
+            "document": SimpleUploadedFile("questions.pdf", b"not a PDF"),
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Choose a valid PDF or DOCX")
+        self.assertEqual(InterviewQuestion.objects.count(), 0)
+
+    def test_accept_docx_and_reject_oversized_file(self):
+        docx_content = self.docx_file()
+        response = self.client.post(self.add_url, {
+            "employer": "Example",
+            "interview_date": "2026-11-24",
+            "document": SimpleUploadedFile("questions.docx", docx_content),
+            "_save": "Save",
+        })
+        self.assertEqual(response.status_code, 302)
+        question = InterviewQuestion.objects.get()
+        self.assertEqual(question.filename, "questions.docx")
+        self.assertEqual(question.content, docx_content)
+
+        response = self.client.post(self.add_url, {
+            "employer": "Another Employer",
+            "interview_date": "2026-11-25",
+            "document": SimpleUploadedFile("large.pdf", b"%PDF-" + b"x" * (5 * 1024 * 1024)),
+            "_save": "Save",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Choose a valid PDF or DOCX")
+        self.assertEqual(InterviewQuestion.objects.count(), 1)
+
+    def test_docx_preview_renders_read_only_html(self):
+        question = InterviewQuestion.objects.create(
+            employer="Example", interview_date="2026-11-24",
+            filename="questions.docx", content=self.docx_file(),
+        )
+        response = self.client.get(reverse("admin:interview_question_preview", args=[question.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/html; charset=utf-8")
+        self.assertContains(response, "Read this interview question")
+        self.assertIn("default-src 'none'", response["Content-Security-Policy"])
+        self.assertContains(
+            self.client.get(reverse("admin:backoffice_interviewquestion_changelist")),
+            'sandbox=""',
+        )
+
+    def test_broken_docx_preview_shows_an_error(self):
+        question = InterviewQuestion.objects.create(
+            employer="Example", interview_date="2026-11-24",
+            filename="questions.docx", content=b"PK\x03\x04broken",
+        )
+        response = self.client.get(reverse("admin:interview_question_preview", args=[question.pk]))
+        self.assertEqual(response.status_code, 422)
+        self.assertContains(response, "This DOCX file is invalid", status_code=422)
+
+    def test_download_requires_interview_question_permission(self):
+        question = InterviewQuestion.objects.create(
+            employer="Example", interview_date="2026-11-24",
+            filename="questions.pdf", content=b"%PDF-1.7\nquestions",
+        )
+        staff = get_user_model().objects.create_user("question-staff", is_staff=True)
+        self.client.force_login(staff)
+        self.assertEqual(
+            self.client.get(reverse("admin:interview_question_document", args=[question.pk])).status_code,
+            404,
+        )
+        self.assertEqual(
+            self.client.get(reverse("admin:interview_question_preview", args=[question.pk])).status_code,
+            404,
+        )
+
+    @staticmethod
+    def docx_file():
+        buffer = BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr(
+                "[Content_Types].xml",
+                '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+                '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+                '<Default Extension="xml" ContentType="application/xml"/>'
+                '<Override PartName="/word/document.xml" '
+                'ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+                "</Types>",
+            )
+            archive.writestr(
+                "word/document.xml",
+                '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+                "<w:body><w:p><w:r><w:t>Read this interview question</w:t></w:r></w:p>"
+                "<w:sectPr/></w:body></w:document>",
+            )
+        return buffer.getvalue()
 
 
 class ApplicationSalaryTests(TestCase):

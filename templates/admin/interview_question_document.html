@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <style>
+    body { margin: 0; padding: 2rem; color: #202124; background: #fff; font: 16px/1.65 system-ui, sans-serif; }
+    main { max-width: 900px; margin: 0 auto; overflow-wrap: anywhere; }
+    img { max-width: 100%; height: auto; }
+    table { max-width: 100%; border-collapse: collapse; }
+    td, th { padding: .4rem .6rem; border: 1px solid #888; }
+    pre { white-space: pre-wrap; }
+    @media (max-width: 600px) { body { padding: 1rem; } }
+  </style>
+</head>
+<body><main>{{ content|safe }}</main></body>
+</html>

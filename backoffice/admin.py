@@ -1,4 +1,7 @@
 from pathlib import Path
+from io import BytesIO
+import zipfile
+from xml.parsers.expat import ExpatError
 
 from django import forms
 from django.contrib import admin, messages
@@ -12,9 +15,10 @@ from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST
 from django.core.exceptions import PermissionDenied
+import mammoth
 
 from .job_import import ImportError as JobImportError, import_posting
-from .models import Application, Document, Visitor
+from .models import Application, Document, InterviewQuestion, Visitor
 from .notifications import queue_notifications
 from .learnings import learnings, learning_progress
 from .logs import logs
@@ -31,10 +35,66 @@ class PortfolioAdmin(admin.AdminSite):
             path("logs/", self.admin_view(lambda request: logs(self, request)), name="logs"),
             path("logs/data/", self.admin_view(lambda request: logs(self, request, data=True)), name="logs_data"),
             path("learnings/", self.admin_view(lambda request: learnings(self, request)), name="learnings"),
+            path("interview-question/<int:pk>/document/", self.admin_view(self.interview_question_document),
+                 name="interview_question_document"),
+            path("interview-question/<int:pk>/preview/", self.admin_view(self.interview_question_preview),
+                 name="interview_question_preview"),
             path("visitor-map/", self.admin_view(self.visitor_map), name="visitor_map"),
             path("visitor-map/data/", self.admin_view(self.visitor_map_data), name="visitor_map_data"),
             *super().get_urls(),
         ]
+
+    def interview_question_document(self, request, pk):
+        question = InterviewQuestion.objects.filter(pk=pk).first()
+        model_admin = self._registry[InterviewQuestion]
+        if question is None or not model_admin.has_view_or_change_permission(request, question):
+            raise Http404
+        response = HttpResponse(question.content, content_type="application/octet-stream")
+        response["Content-Disposition"] = content_disposition_header(True, question.filename)
+        response["X-Content-Type-Options"] = "nosniff"
+        return response
+
+    def interview_question_preview(self, request, pk):
+        question = InterviewQuestion.objects.filter(pk=pk).first()
+        model_admin = self._registry[InterviewQuestion]
+        if question is None or not model_admin.has_view_or_change_permission(request, question):
+            raise Http404
+
+        filename = question.filename.lower()
+        if filename.endswith(".pdf") and question.content.startswith(b"%PDF-"):
+            response = HttpResponse(question.content, content_type="application/pdf")
+            response["Content-Disposition"] = content_disposition_header(False, question.filename)
+            response["X-Content-Type-Options"] = "nosniff"
+            response["X-Frame-Options"] = "SAMEORIGIN"
+            response["Cache-Control"] = "private, no-store"
+            return response
+
+        if filename.endswith(".docx") and question.content.startswith(b"PK\x03\x04"):
+            try:
+                result = mammoth.convert_to_html(BytesIO(question.content))
+            except (zipfile.BadZipFile, KeyError, ExpatError):
+                return HttpResponse(
+                    "This DOCX file is invalid and cannot be previewed.",
+                    status=422,
+                    content_type="text/plain; charset=utf-8",
+                )
+            response = HttpResponse(
+                render_to_string("admin/interview_question_document.html", {
+                    "title": question.filename,
+                    "content": result.value,
+                }),
+                content_type="text/html; charset=utf-8",
+            )
+            response["Content-Security-Policy"] = (
+                "default-src 'none'; img-src data:; style-src 'unsafe-inline'; "
+                "font-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"
+            )
+            response["X-Content-Type-Options"] = "nosniff"
+            response["X-Frame-Options"] = "SAMEORIGIN"
+            response["Cache-Control"] = "private, no-store"
+            return response
+
+        raise Http404
 
     def check_visitor_permission(self, request):
         if not request.user.has_perm("backoffice.view_visitor"):
@@ -57,12 +117,22 @@ class PortfolioAdmin(admin.AdminSite):
         countries = Visitor.objects.values("country").annotate(visitors=Count("pk"))
         applications = Application.objects.all()
         can_view_interviews = request.user.has_perm("backoffice.view_application") or request.user.has_perm("backoffice.change_application")
+        can_view_questions = (
+            request.user.has_perm("backoffice.view_interviewquestion")
+            or request.user.has_perm("backoffice.change_interviewquestion")
+        )
+        can_add_questions = request.user.has_perm("backoffice.add_interviewquestion")
         upcoming = applications.filter(interview_at__gte=timezone.now()).exclude(
             stage__in=Application.CLOSED).order_by("interview_at", "pk")[:3] if can_view_interviews else []
         return super().index(request, {
             "learning": learning_progress(request.user),
             "can_view_interviews": can_view_interviews,
             "upcoming_interviews": upcoming,
+            "can_view_interview_questions": can_view_questions,
+            "can_manage_interview_questions": can_view_questions or can_add_questions,
+            "interview_questions": InterviewQuestion.objects.only(
+                "id", "employer", "interview_date", "filename"
+            )[:3] if can_view_questions else [],
             "visitor_count": Visitor.objects.count(),
             "countries": countries.order_by("-visitors", "country"),
             "locations": locations.exclude(region="").order_by("-visitors", "country", "region"),
@@ -74,6 +144,93 @@ class PortfolioAdmin(admin.AdminSite):
 
 
 site = PortfolioAdmin(name="admin")
+
+
+class InterviewQuestionForm(forms.ModelForm):
+    document = forms.FileField(
+        label="Question document",
+        required=False,
+        widget=forms.FileInput(attrs={"accept": ".pdf,.docx"}),
+        help_text="PDF or DOCX, up to 5 MB.",
+    )
+
+    class Meta:
+        model = InterviewQuestion
+        fields = ("employer", "interview_date")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["document"].required = self.instance.pk is None
+
+    def clean_document(self):
+        upload = self.cleaned_data.get("document")
+        if not upload:
+            return upload
+
+        extension = Path(upload.name).suffix.lower()
+        signature = upload.read(5)
+        upload.seek(0)
+        valid = (extension == ".pdf" and signature == b"%PDF-") or (
+            extension == ".docx" and signature.startswith(b"PK\x03\x04")
+        )
+        if upload.size > 5 * 1024 * 1024 or not valid:
+            raise forms.ValidationError("Choose a valid PDF or DOCX file up to 5 MB.")
+        return upload
+
+
+@admin.register(InterviewQuestion, site=site)
+class InterviewQuestionAdmin(admin.ModelAdmin):
+    form = InterviewQuestionForm
+    change_list_template = "admin/interviewquestion_change_list.html"
+    fields = ("employer", "interview_date", "document", "saved_document")
+    readonly_fields = ("saved_document",)
+    list_display = ("employer", "interview_date", "preview_button", "document_link")
+    list_display_links = ("employer",)
+    list_filter = ("interview_date",)
+    search_fields = ("employer", "filename")
+    ordering = ("-interview_date", "employer")
+
+    @admin.display(description="Saved document")
+    def saved_document(self, obj):
+        if not obj or not obj.pk:
+            return "Save an interview question to attach a document."
+        return format_html(
+            '<a href="{}">{}</a>',
+            reverse("admin:interview_question_document", args=[obj.pk]),
+            obj.filename,
+        )
+
+    @admin.display(description="Document")
+    def document_link(self, obj):
+        return format_html(
+            '<a href="{}">{}</a>',
+            reverse("admin:interview_question_document", args=[obj.pk]),
+            obj.filename,
+        )
+
+    @admin.display(description="Preview")
+    def preview_button(self, obj):
+        return format_html(
+            '<button type="button" class="interview-question-preview-button" '
+            'data-interview-question-preview="{}" data-document-title="{}" '
+            'data-document-filename="{}" data-document-download="{}" '
+            'aria-label="Preview {}" title="Preview document" aria-haspopup="dialog">'
+            '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+            '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>'
+            '<circle cx="12" cy="12" r="3"/></svg></button>',
+            reverse("admin:interview_question_preview", args=[obj.pk]),
+            obj.filename,
+            obj.filename,
+            reverse("admin:interview_question_document", args=[obj.pk]),
+            obj.filename,
+        )
+
+    def save_model(self, request, obj, form, change):
+        upload = form.cleaned_data.get("document")
+        if upload:
+            obj.filename = Path(upload.name).name[:200]
+            obj.content = upload.read()
+        super().save_model(request, obj, form, change)
 
 
 class ApplicationForm(forms.ModelForm):
